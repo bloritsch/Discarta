@@ -96,7 +96,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\OfflneMap\DisCarta.csproj">
+    <ProjectReference Include="..\DHaven.DisCarta\DisCarta.csproj">
       <Project>{f27469bf-0000-4c66-907a-8656f2af03cf}</Project>
       <Name>DisCarta</Name>
     </ProjectReference>
