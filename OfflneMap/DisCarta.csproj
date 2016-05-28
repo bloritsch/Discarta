@@ -7,8 +7,8 @@
     <ProjectGuid>{F27469BF-0000-4C66-907A-8656F2AF03CF}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DHaven.OfflneMap</RootNamespace>
-    <AssemblyName>DHaven.OfflneMap</AssemblyName>
+    <RootNamespace>DHaven.DisCarta</RootNamespace>
+    <AssemblyName>DHaven.DisCarta</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -46,7 +46,10 @@
     <Compile Include="GeoVector.cs" />
     <Compile Include="Internals\BasePropertyChanged.cs" />
     <Compile Include="Internals\ArgumentUtils.cs" />
+    <Compile Include="IProjection.cs" />
+    <Compile Include="MapView.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TileCoord.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

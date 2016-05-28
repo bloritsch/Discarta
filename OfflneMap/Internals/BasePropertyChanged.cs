@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 
-namespace DHaven.OfflneMap.Internals
+namespace DHaven.DisCarta.Internals
 {
     /// <summary>
     /// Base class used to simplify INotifyPropertyChanged eventing.

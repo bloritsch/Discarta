@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DHaven.OfflneMap.Internals
+namespace DHaven.DisCarta.Internals
 {
     static class ArgumentUtils
     {

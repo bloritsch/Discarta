@@ -1,7 +1,7 @@
-﻿using DHaven.OfflneMap.Internals;
+﻿using DHaven.DisCarta.Internals;
 using System;
 
-namespace DHaven.OfflneMap
+namespace DHaven.DisCarta
 {
     /// <summary>
     /// Represents a point on the map in degrees lat/lon and meters above see level.

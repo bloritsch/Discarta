@@ -96,9 +96,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\OfflneMap\OfflneMap.csproj">
+    <ProjectReference Include="..\OfflneMap\DisCarta.csproj">
       <Project>{f27469bf-0000-4c66-907a-8656f2af03cf}</Project>
-      <Name>OfflneMap</Name>
+      <Name>DisCarta</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

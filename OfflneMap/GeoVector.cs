@@ -1,7 +1,7 @@
-﻿using DHaven.OfflneMap.Internals;
+﻿using DHaven.DisCarta.Internals;
 using System;
 
-namespace DHaven.OfflneMap
+namespace DHaven.DisCarta
 {
     public struct GeoVector : IEquatable<GeoVector>
     {
