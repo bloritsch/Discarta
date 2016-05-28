@@ -5,7 +5,6 @@ namespace DHaven.DisCarta
 {
     public struct GeoArea : IEquatable<GeoArea>
     {
-        public static readonly GeoArea World = new GeoArea(90, 180, -90, -180);
         public static readonly GeoArea Empty = new GeoArea(GeoPoint.Empty, GeoVector.Empty);
 
         public GeoArea(double north, double east, double south, double west)
@@ -104,6 +103,15 @@ namespace DHaven.DisCarta
 
                 return hash;
             }
+        }
+
+        public void Expand(GeoVector dimensions)
+        {
+            // Split the difference so that the center doesn't change.
+            NorthWest.Latitude -= dimensions.DeltaLatitude / 2;
+            NorthWest.Longitude -= dimensions.DeltaLongitude / 2;
+            Size.DeltaLatitude += dimensions.DeltaLatitude / 2;
+            Size.DeltaLongitude += dimensions.DeltaLongitude / 2;
         }
 
         public override string ToString()

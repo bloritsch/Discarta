@@ -48,6 +48,8 @@
     <Compile Include="Internals\ArgumentUtils.cs" />
     <Compile Include="IProjection.cs" />
     <Compile Include="MapView.cs" />
+    <Compile Include="Projections\EquirectangularProjection.cs" />
+    <Compile Include="Projections\PseudoMercatorProjection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TileCoord.cs" />
   </ItemGroup>

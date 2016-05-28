@@ -15,6 +15,13 @@ namespace DHaven.DisCarta
         string Name { get; }
 
         /// <summary>
+        /// The Well Known Text definition.  Used by GDAL, and many other spatial system.
+        /// </summary>
+        string WKT { get; }
+
+        GeoArea World { get; }
+
+        /// <summary>
         /// Gets the standard tile size for this projection
         /// </summary>
         Size TileSize { get; }
