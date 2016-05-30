@@ -20,7 +20,7 @@ namespace DHaven.DisCarta
     /// <summary>
     /// Represents the current view of a map or map layer.
     /// </summary>
-    public class VisualExtent : BasePropertyChanged
+    public class Extent : BasePropertyChanged
     {
         private GeoArea extent;
         private int zoomLevel;
@@ -29,7 +29,7 @@ namespace DHaven.DisCarta
         /// <summary>
         /// Gets or sets the geographic extent of the map.
         /// </summary>
-        public GeoArea Extent
+        public GeoArea Area
         {
             get { return extent; }
             set
@@ -37,7 +37,7 @@ namespace DHaven.DisCarta
                 if(extent != value)
                 {
                     extent = value;
-                    RaisePropertyChanged(nameof(Extent));
+                    RaisePropertyChanged(nameof(Area));
                 }
             }
         }

@@ -31,7 +31,7 @@ namespace DHaven.DisCarta.Internals
         /// <returns></returns>
         public static bool IsSameAs(this double first, double second, double precision)
         {
-            return Math.Abs(first - second) > precision;
+            return Math.Abs(first - second) < precision;
         }
 
         public static double ToDegrees(double radians)

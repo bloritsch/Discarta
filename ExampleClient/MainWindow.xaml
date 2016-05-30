@@ -8,6 +8,8 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
     <Grid>
-        <DisCarta:Map/>
+        <DisCarta:Map>
+            <DisCarta:MapLayer Background="Blue"/>
+        </DisCarta:Map>
     </Grid>
 </Window>

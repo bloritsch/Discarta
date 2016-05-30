@@ -60,12 +60,12 @@ namespace DHaven.DisCarta.Projections
             return new Size(width, height);
         }
 
-        public GeoArea ToGeoArea(Rect rect, VisualExtent mapView)
+        public GeoArea ToGeoArea(Rect rect, Extent mapView)
         {
             return new GeoArea(ToGeoPoint(rect.TopLeft, mapView), ToGeoPoint(rect.BottomRight, mapView));
         }
 
-        public GeoPoint ToGeoPoint(Point point, VisualExtent mapView)
+        public GeoPoint ToGeoPoint(Point point, Extent mapView)
         {
             return new GeoPoint
             {
@@ -74,7 +74,7 @@ namespace DHaven.DisCarta.Projections
             };
         }
 
-        public Point ToPoint(GeoPoint point, VisualExtent mapView)
+        public Point ToPoint(GeoPoint point, Extent mapView)
         {
             return new Point
             {
@@ -83,29 +83,29 @@ namespace DHaven.DisCarta.Projections
             };
         }
 
-        public Rect ToRect(GeoArea extent, VisualExtent mapView)
+        public Rect ToRect(GeoArea extent, Extent mapView)
         {
             return new Rect(ToPoint(extent.NorthWest, mapView), ToPoint(extent.SouthEast, mapView));
         }
 
-        private double ToX(double longitude, VisualExtent mapView)
+        private double ToX(double longitude, Extent mapView)
         {
-            return longitude * (mapView.Screen.Width / mapView.Extent.Size.DeltaLongitude);
+            return longitude * (mapView.Screen.Width / mapView.Area.Size.DeltaLongitude);
         }
 
-        private double ToY(double latitude, VisualExtent mapView)
+        private double ToY(double latitude, Extent mapView)
         {
-            return latitude * (mapView.Screen.Height / mapView.Extent.Size.DeltaLatitude);
+            return latitude * (mapView.Screen.Height / mapView.Area.Size.DeltaLatitude);
         }
 
-        private double ToLon(double x, VisualExtent mapView)
+        private double ToLon(double x, Extent mapView)
         {
-            return x * (mapView.Extent.Size.DeltaLongitude / mapView.Screen.Width);
+            return x * (mapView.Area.Size.DeltaLongitude / mapView.Screen.Width);
         }
 
-        private double ToLat(double y, VisualExtent mapView)
+        private double ToLat(double y, Extent mapView)
         {
-            return y * (mapView.Extent.Size.DeltaLatitude / mapView.Screen.Height);
+            return y * (mapView.Area.Size.DeltaLatitude / mapView.Screen.Height);
         }
     }
 }

@@ -63,12 +63,12 @@ namespace DHaven.DisCarta.Projections
             return new Size(side, side);
         }
 
-        public GeoArea ToGeoArea(Rect rect, VisualExtent mapView)
+        public GeoArea ToGeoArea(Rect rect, Extent mapView)
         {
             return new GeoArea(ToGeoPoint(rect.TopLeft, mapView), ToGeoPoint(rect.BottomRight, mapView));
         }
 
-        public GeoPoint ToGeoPoint(Point point, VisualExtent mapView)
+        public GeoPoint ToGeoPoint(Point point, Extent mapView)
         {
             return new GeoPoint
             {
@@ -77,7 +77,7 @@ namespace DHaven.DisCarta.Projections
             };
         }
 
-        public Point ToPoint(GeoPoint point, VisualExtent mapView)
+        public Point ToPoint(GeoPoint point, Extent mapView)
         {
             return new Point
             {
@@ -86,12 +86,12 @@ namespace DHaven.DisCarta.Projections
             };
         }
 
-        public Rect ToRect(GeoArea extent, VisualExtent mapView)
+        public Rect ToRect(GeoArea extent, Extent mapView)
         {
             return new Rect(ToPoint(extent.NorthWest, mapView), ToPoint(extent.SouthEast, mapView));
         }
 
-        private double ToX(double longitude, VisualExtent mapView)
+        private double ToX(double longitude, Extent mapView)
         {
             // TODO: adjust for screen size!!!
             // Does not consider extent and screen size as a view into the map at
@@ -101,7 +101,7 @@ namespace DHaven.DisCarta.Projections
             return zoomFactor * (ArgumentUtils.ToRadians(longitude) + Math.PI);
         }
 
-        private double ToY(double latitude, VisualExtent mapView)
+        private double ToY(double latitude, Extent mapView)
         {
             // TODO: adjust for screen size!!!
             // Does not consider extent and screen size as a view into the map at
@@ -111,14 +111,14 @@ namespace DHaven.DisCarta.Projections
             return zoomFactor * (Math.PI - Math.Log(Math.Tan(Math.PI / 4 + ArgumentUtils.ToRadians(latitude) / 2)));
         }
 
-        private double ToLon(double x, VisualExtent mapView)
+        private double ToLon(double x, Extent mapView)
         {
             // TODO: adjust for screen size!!!
             double zoomFactor = K * Math.Pow(2, mapView.ZoomLevel);
             return ArgumentUtils.ToDegrees(x / zoomFactor - Math.PI);
         }
 
-        private double ToLat(double y, VisualExtent mapView)
+        private double ToLat(double y, Extent mapView)
         {
             // TODO: adjust for screen size!!!
             double zoomFactor = K * Math.Pow(2, mapView.ZoomLevel);

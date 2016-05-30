@@ -54,7 +54,7 @@ namespace DHaven.DisCarta
                     north = Math.Max(north, point.Latitude);
                     south = Math.Min(south, point.Latitude);
                     east = Math.Max(east, point.Longitude);
-                    west = Math.Min(east, point.Longitude);
+                    west = Math.Min(west, point.Longitude);
                 }
 
                 NorthWest = new GeoPoint(north, west);
@@ -74,17 +74,17 @@ namespace DHaven.DisCarta
 
         public GeoPoint SouthWest
         {
-            get { return new GeoPoint(NorthWest.Latitude + Size.DeltaLatitude, NorthWest.Longitude); }
+            get { return new GeoPoint(NorthWest.Latitude - Size.DeltaLatitude, NorthWest.Longitude); }
         }
 
         public GeoPoint SouthEast
         {
-            get { return new GeoPoint(NorthWest.Latitude + Size.DeltaLatitude, NorthWest.Longitude + Size.DeltaLongitude); }
+            get { return new GeoPoint(NorthWest.Latitude - Size.DeltaLatitude, NorthWest.Longitude + Size.DeltaLongitude); }
         }
 
         public GeoPoint Center
         {
-            get { return new GeoPoint(NorthWest.Latitude + (Size.DeltaLatitude / 2), NorthWest.Longitude + (Size.DeltaLongitude / 2)); }
+            get { return new GeoPoint(NorthWest.Latitude - (Size.DeltaLatitude / 2), NorthWest.Longitude + (Size.DeltaLongitude / 2)); }
         }
 
         public static bool operator ==(GeoArea first, GeoArea second)

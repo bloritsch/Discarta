@@ -53,7 +53,7 @@ namespace DHaven.DisCarta
         /// <param name="point">the GeoPoint to convert</param>
         /// <param name="mapView">the current map view</param>
         /// <returns>the screen coordinate</returns>
-        Point ToPoint(GeoPoint point, VisualExtent mapView);
+        Point ToPoint(GeoPoint point, Extent mapView);
 
         /// <summary>
         /// Convert a GeoArea to a placement Rect.
@@ -61,7 +61,7 @@ namespace DHaven.DisCarta
         /// <param name="extent">the GeoArea to convert</param>
         /// <param name="mapView">the current map view</param>
         /// <returns>the placement rect</returns>
-        Rect ToRect(GeoArea extent, VisualExtent mapView);
+        Rect ToRect(GeoArea extent, Extent mapView);
 
         /// <summary>
         /// Convert a screen Point to a GeoPoint.
@@ -69,7 +69,7 @@ namespace DHaven.DisCarta
         /// <param name="point">the screen point to convert</param>
         /// <param name="mapView">the current map view</param>
         /// <returns>the corresponding GeoPoint</returns>
-        GeoPoint ToGeoPoint(Point point, VisualExtent mapView);
+        GeoPoint ToGeoPoint(Point point, Extent mapView);
 
         /// <summary>
         /// Convert a placement rect to a GeoArea.
@@ -77,6 +77,6 @@ namespace DHaven.DisCarta
         /// <param name="rect">the placement rect to convert</param>
         /// <param name="mapView">the current map view</param>
         /// <returns>the corresponding GeoArea</returns>
-        GeoArea ToGeoArea(Rect rect, VisualExtent mapView);
+        GeoArea ToGeoArea(Rect rect, Extent mapView);
     }
 }

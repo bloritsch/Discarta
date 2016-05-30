@@ -19,20 +19,44 @@ using System.Collections.Specialized;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Media;
+using System.ComponentModel;
 
 namespace DHaven.DisCarta
 {
     public class Map : Panel
     {
         public static readonly DependencyProperty ProjectionProperty = DependencyProperty.RegisterAttached("Projection", typeof(IProjection), typeof(Map), new FrameworkPropertyMetadata(new PseudoMercatorProjection(), FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
-        public static readonly DependencyProperty VisualExtentProperty = DependencyProperty.RegisterAttached("VisualExtentProperty", typeof(VisualExtent), typeof(Map), new FrameworkPropertyMetadata(new VisualExtent(), FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
+        public static readonly DependencyProperty ExtentProperty = DependencyProperty.RegisterAttached("ExtentProperty", typeof(Extent), typeof(Map), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, VisualExtentChanged));
 
-        private TranslateTransform mapOffset = new TranslateTransform();
+        private bool loading = true;
 
         public Map()
         {
-            LayoutTransform = mapOffset;
+            Loaded += MapLoaded;
+        }
+
+        private void MapLoaded(object sender, RoutedEventArgs e)
+        {
+            Loaded -= MapLoaded;
+            loading = false;
+
+            // Size the map so it is big enough to cover the visible area
+
+            int desiredZoomLevel = -1;
+            Size mapSize = Size.Empty;
+
+            while(mapSize.Width < ActualWidth && mapSize.Height < ActualHeight)
+            {
+                desiredZoomLevel++;
+                mapSize = Projection.FullMapSizeFor(desiredZoomLevel);
+            }
+
+            Extent = new Extent
+            {
+                Area = Projection.World,
+                Screen = new Size(ActualWidth, ActualHeight),
+                ZoomLevel = desiredZoomLevel
+            };
         }
 
         public IProjection Projection
@@ -41,10 +65,10 @@ namespace DHaven.DisCarta
             set { SetProjection(this, value); }
         }
 
-        public VisualExtent VisualExtent
+        public Extent Extent
         {
-            get { return GetVisualExtent(this); }
-            set { SetVisualExtent(this, value); }
+            get { return GetExtent(this); }
+            set { SetExtent(this, value); }
         }
 
         public static IProjection GetProjection(DependencyObject dependencyObject)
@@ -57,28 +81,28 @@ namespace DHaven.DisCarta
             dependencyObject.SetValue(ProjectionProperty, value);
         }
 
-        public static VisualExtent GetVisualExtent(DependencyObject dependencyObject)
+        public static Extent GetExtent(DependencyObject dependencyObject)
         {
-            return dependencyObject.GetValue(VisualExtentProperty) as VisualExtent;
+            return dependencyObject.GetValue(ExtentProperty) as Extent;
         }
 
-        public static void SetVisualExtent(DependencyObject dependencyObject, VisualExtent value)
+        public static void SetExtent(DependencyObject dependencyObject, Extent value)
         {
-            dependencyObject.SetValue(VisualExtentProperty, value);
+            dependencyObject.SetValue(ExtentProperty, value);
         }
 
         protected override Size MeasureOverride(Size availableSize)
         {
             Size tempSize = base.MeasureOverride(availableSize);
 
-            if(Projection == null || VisualExtent == null)
+            if (loading || Projection == null || Extent == null)
             {
                 return tempSize;
             }
 
-            Size mapSize = Projection.FullMapSizeFor(VisualExtent.ZoomLevel);
+            Size mapSize = Projection.FullMapSizeFor(Extent.ZoomLevel);
 
-            foreach(UIElement child in InternalChildren)
+            foreach (UIElement child in InternalChildren)
             {
                 Size desiredSize = child is MapLayer ? mapSize : new Size();
                 child.Measure(mapSize);
@@ -91,14 +115,14 @@ namespace DHaven.DisCarta
         {
             Size tempSize = base.ArrangeOverride(finalSize);
 
-            Rect viewRect = Projection.ToRect(VisualExtent.Extent, VisualExtent);
-            mapOffset.X = viewRect.Size.Width < finalSize.Width ? (finalSize.Width - viewRect.Width) / 2 : -viewRect.X;
-            mapOffset.Y = viewRect.Size.Height < finalSize.Height ? (finalSize.Height - viewRect.Height) / 2 : -viewRect.Y;
-
-            if (Projection == null || VisualExtent == null)
+            if (loading || Projection == null || Extent == null)
             {
                 return tempSize;
             }
+
+            Rect viewRect = Projection.ToRect(Extent.Area, Extent);
+            viewRect.X = viewRect.Size.Width < ActualWidth ? (ActualWidth - viewRect.Width) / 2 : viewRect.X;
+            viewRect.Y = viewRect.Size.Height < ActualHeight ? (ActualHeight - viewRect.Height) / 2 : viewRect.Y;
 
             foreach (UIElement child  in InternalChildren)
             {
@@ -126,10 +150,10 @@ namespace DHaven.DisCarta
                 Mode = BindingMode.TwoWay
             });
 
-            child.SetBinding(VisualExtentProperty, new Binding
+            child.SetBinding(ExtentProperty, new Binding
             {
                 Source = this,
-                Path = new PropertyPath(VisualExtentProperty),
+                Path = new PropertyPath(ExtentProperty),
                 Mode = BindingMode.TwoWay
             });
         }
@@ -137,7 +161,52 @@ namespace DHaven.DisCarta
         private void UnbindLayer(MapLayer child)
         {
             BindingOperations.ClearBinding(child, ProjectionProperty);
-            BindingOperations.ClearBinding(child, VisualExtentProperty);
+            BindingOperations.ClearBinding(child, ExtentProperty);
+        }
+
+        private static void VisualExtentChanged(DependencyObject d, DependencyPropertyChangedEventArgs args)
+        {
+            Map map = d as Map;
+
+            if(map == null)
+            {
+                return;
+            }
+
+            Extent oldExtent = args.OldValue as Extent;
+            if (oldExtent != null)
+            {
+                oldExtent.PropertyChanged -= map.VisualExtentValuesChanged;
+            }
+
+            Extent newExtent = args.NewValue as Extent;
+            if (newExtent == null)
+            {
+                map.SizeChanged -= map.MapSizeChanged;
+            }
+            else
+            {
+                newExtent.PropertyChanged += map.VisualExtentValuesChanged;
+
+                map.SizeChanged += map.MapSizeChanged;
+            }
+        }
+
+        private void VisualExtentValuesChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == string.Empty || e.PropertyName == nameof(Extent.ZoomLevel))
+            {
+                // Measurements only change when the zoom level changes.  Screen size affects the visual port,
+                // and GeoArea affects the geographic area under the map
+                InvalidateMeasure();
+            }
+
+            InvalidateArrange();
+        }
+
+        private void MapSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            Extent.Screen = new Size(ActualWidth, ActualHeight);
         }
 
         private void ChildrenCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)

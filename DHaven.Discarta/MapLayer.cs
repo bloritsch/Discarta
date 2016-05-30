@@ -32,10 +32,10 @@ namespace DHaven.DisCarta
             set { Map.SetProjection(this, value); }
         }
 
-        public VisualExtent VisualExtent
+        public Extent VisualExtent
         {
-            get { return Map.GetVisualExtent(this); }
-            set { Map.SetVisualExtent(this, value); }
+            get { return Map.GetExtent(this); }
+            set { Map.SetExtent(this, value); }
         }
 
         protected override UIElementCollection CreateUIElementCollection(FrameworkElement logicalParent)

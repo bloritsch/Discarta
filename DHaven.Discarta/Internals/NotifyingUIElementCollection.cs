@@ -43,7 +43,7 @@ namespace DHaven.DisCarta.Internals
             UIElement[] oldChildren = this.Cast<UIElement>().ToArray();
             base.Clear();
 
-            RaiseCollectionChanged(NotifyCollectionChangedAction.Reset, oldChildren);
+            RaiseCollectionChanged(NotifyCollectionChangedAction.Remove, oldChildren);
         }
 
         public override void Insert(int index, UIElement element)
