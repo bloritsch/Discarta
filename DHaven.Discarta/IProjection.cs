@@ -27,12 +27,19 @@ namespace DHaven.DisCarta
         Size TileSize { get; }
 
         /// <summary>
+        /// Calculate the full map size for the zoom level requested.
+        /// </summary>
+        /// <param name="zoomLevel">calculates the full map size for the zoom level requested</param>
+        /// <returns>the size in display units</returns>
+        Size FullMapSizeFor(int zoomLevel);
+
+        /// <summary>
         /// Convert a GeoPoint to a screen Point.
         /// </summary>
         /// <param name="point">the GeoPoint to convert</param>
         /// <param name="mapView">the current map view</param>
         /// <returns>the screen coordinate</returns>
-        Point ToPoint(GeoPoint point, MapView mapView);
+        Point ToPoint(GeoPoint point, VisualExtent mapView);
 
         /// <summary>
         /// Convert a GeoArea to a placement Rect.
@@ -40,7 +47,7 @@ namespace DHaven.DisCarta
         /// <param name="extent">the GeoArea to convert</param>
         /// <param name="mapView">the current map view</param>
         /// <returns>the placement rect</returns>
-        Rect ToRect(GeoArea extent, MapView mapView);
+        Rect ToRect(GeoArea extent, VisualExtent mapView);
 
         /// <summary>
         /// Convert a screen Point to a GeoPoint.
@@ -48,7 +55,7 @@ namespace DHaven.DisCarta
         /// <param name="point">the screen point to convert</param>
         /// <param name="mapView">the current map view</param>
         /// <returns>the corresponding GeoPoint</returns>
-        GeoPoint ToGeoPoint(Point point, MapView mapView);
+        GeoPoint ToGeoPoint(Point point, VisualExtent mapView);
 
         /// <summary>
         /// Convert a placement rect to a GeoArea.
@@ -56,15 +63,6 @@ namespace DHaven.DisCarta
         /// <param name="rect">the placement rect to convert</param>
         /// <param name="mapView">the current map view</param>
         /// <returns>the corresponding GeoArea</returns>
-        GeoArea ToGeoArea(Rect rect, MapView mapView);
-
-        /// <summary>
-        /// Used to retrieve map tiles from the file system or a remote
-        /// map server.  Gets all tiles that are completely or partially
-        /// contained in this map view.
-        /// </summary>
-        /// <param name="mapView">the current map view</param>
-        /// <returns>the set of tiles that are displayed on screen</returns>
-        ICollection<TileCoord> GetAffectedTiles(MapView mapView);
+        GeoArea ToGeoArea(Rect rect, VisualExtent mapView);
     }
 }

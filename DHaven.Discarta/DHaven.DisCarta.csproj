@@ -30,8 +30,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -46,12 +49,14 @@
     <Compile Include="GeoVector.cs" />
     <Compile Include="Internals\BasePropertyChanged.cs" />
     <Compile Include="Internals\ArgumentUtils.cs" />
+    <Compile Include="Internals\NotifyingUIElementCollection.cs" />
     <Compile Include="IProjection.cs" />
-    <Compile Include="MapView.cs" />
+    <Compile Include="Map.cs" />
+    <Compile Include="MapLayer.cs" />
+    <Compile Include="VisualExtent.cs" />
     <Compile Include="Projections\EquirectangularProjection.cs" />
     <Compile Include="Projections\PseudoMercatorProjection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TileCoord.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

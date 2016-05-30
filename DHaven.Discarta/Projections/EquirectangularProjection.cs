@@ -43,18 +43,19 @@ namespace DHaven.DisCarta.Projections
 
         public GeoArea World { get { return new GeoArea(90, -180, -90, 180); } }
 
-        public ICollection<TileCoord> GetAffectedTiles(MapView mapView)
+        public Size FullMapSizeFor(int zoomLevel)
         {
-            AdjustView(mapView);
-            throw new NotImplementedException();
+            double width = 2 * TileSize.Width * Math.Pow(2, zoomLevel);
+            double height = TileSize.Height * Math.Pow(2, zoomLevel);
+            return new Size(width, height);
         }
 
-        public GeoArea ToGeoArea(Rect rect, MapView mapView)
+        public GeoArea ToGeoArea(Rect rect, VisualExtent mapView)
         {
             return new GeoArea(ToGeoPoint(rect.TopLeft, mapView), ToGeoPoint(rect.BottomRight, mapView));
         }
 
-        public GeoPoint ToGeoPoint(Point point, MapView mapView)
+        public GeoPoint ToGeoPoint(Point point, VisualExtent mapView)
         {
             return new GeoPoint
             {
@@ -63,7 +64,7 @@ namespace DHaven.DisCarta.Projections
             };
         }
 
-        public Point ToPoint(GeoPoint point, MapView mapView)
+        public Point ToPoint(GeoPoint point, VisualExtent mapView)
         {
             return new Point
             {
@@ -72,72 +73,29 @@ namespace DHaven.DisCarta.Projections
             };
         }
 
-        public Rect ToRect(GeoArea extent, MapView mapView)
+        public Rect ToRect(GeoArea extent, VisualExtent mapView)
         {
             return new Rect(ToPoint(extent.NorthWest, mapView), ToPoint(extent.SouthEast, mapView));
         }
 
-        private double ToX(double longitude, MapView mapView)
+        private double ToX(double longitude, VisualExtent mapView)
         {
             return longitude * (mapView.Screen.Width / mapView.Extent.Size.DeltaLongitude);
         }
 
-        private double ToY(double latitude, MapView mapView)
+        private double ToY(double latitude, VisualExtent mapView)
         {
             return latitude * (mapView.Screen.Height / mapView.Extent.Size.DeltaLatitude);
         }
 
-        private double ToLon(double x, MapView mapView)
+        private double ToLon(double x, VisualExtent mapView)
         {
             return x * (mapView.Extent.Size.DeltaLongitude / mapView.Screen.Width);
         }
 
-        private double ToLat(double y, MapView mapView)
+        private double ToLat(double y, VisualExtent mapView)
         {
             return y * (mapView.Extent.Size.DeltaLatitude / mapView.Screen.Height);
-        }
-
-        /// <summary>
-        /// Ensure the MapView and screen coordinates are
-        /// proportional.  NOTE: possibility of generating an
-        /// extent that is is larger than the earth.
-        /// </summary>
-        /// <param name="mapView"></param>
-        private void AdjustView(MapView mapView)
-        {
-            // Screen coordinates are king.  The extent gets adjusted
-            // to the screen's proportions.
-            double screenRatio = mapView.Screen.Width / mapView.Screen.Height;
-
-            // Represents the scaling factor to calculate max dimensions
-            double scalingFactor = 1 / (Math.Pow(2, mapView.ZoomLevel));
-            double maxGeoWidth = World.Size.DeltaLongitude * scalingFactor;
-            double maxGeoHeight = World.Size.DeltaLatitude * scalingFactor;
-            GeoVector mapSize = GeoVector.Empty;
-
-            if (screenRatio < 1)
-            {
-                // taller than wide, so calculate width from maxGeoHeight
-                mapSize = new GeoVector
-                {
-                    DeltaLatitude = maxGeoHeight,
-                    DeltaLongitude = maxGeoHeight * screenRatio
-                };
-            }
-            else
-            {
-                // wider than tall
-                mapSize = new GeoVector
-                {
-                    DeltaLatitude = maxGeoWidth * screenRatio,
-                    DeltaLongitude = maxGeoWidth
-                };
-            }
-
-            // Create a 0 sized extent and then expand it
-            GeoArea newExtent = new GeoArea(mapView.Extent.Center);
-            newExtent.Expand(mapSize);
-            mapView.Extent = newExtent;
         }
     }
 }

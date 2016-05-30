@@ -11,7 +11,7 @@ namespace DHaven.DisCarta
     /// <summary>
     /// Represents the current view of a map or map layer.
     /// </summary>
-    public class MapView : BasePropertyChanged
+    public class VisualExtent : BasePropertyChanged
     {
         private GeoArea extent;
         private int zoomLevel;
