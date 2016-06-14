@@ -44,6 +44,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Geo.cs" />
     <Compile Include="GeoArea.cs" />
     <Compile Include="GeoPoint.cs" />
     <Compile Include="GeoVector.cs" />

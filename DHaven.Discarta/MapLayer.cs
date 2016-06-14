@@ -1,7 +1,4 @@
-﻿using DHaven.DisCarta.Internals;
-using System;
-using System.Collections.Generic;
-#region Copyright 2016 D-Haven.org
+﻿#region Copyright 2016 D-Haven.org
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,10 +12,9 @@ using System.Collections.Generic;
  * limitations under the License.
  */
 #endregion
+
+using DHaven.DisCarta.Internals;
 using System.Collections.Specialized;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -46,33 +42,103 @@ namespace DHaven.DisCarta
             return collection;
         }
 
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            base.MeasureOverride(availableSize);
+
+            Size desiredSize = Projection.FullMapSizeFor(VisualExtent.ZoomLevel);
+
+            foreach(UIElement child in InternalChildren)
+            {
+                child.Measure(desiredSize);
+            }
+
+            return desiredSize;
+        }
+
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            Size renderSize = base.ArrangeOverride(finalSize);
+
+            foreach(UIElement child in InternalChildren)
+            {
+                bool isPlaced = PlaceIfArea(child);
+
+                if (!isPlaced)
+                {
+                    isPlaced = PlaceIfPoint(child);
+                }
+
+                // TODO: canvas positioning for non geographic elements.
+            }
+
+            return renderSize;
+        }
+
+        private bool PlaceIfArea(UIElement element)
+        {
+            GeoArea elementExtent = Geo.GetArea(element);
+            bool isArea = !elementExtent.IsEmpty;
+
+            if (isArea)
+            {
+                Rect destRect = Projection.ToRect(elementExtent, VisualExtent);
+                element.Arrange(destRect);
+            }
+
+            return isArea;
+        }
+
+        private bool PlaceIfPoint(UIElement element)
+        {
+            GeoPoint elementLocation = Geo.GetLocation(element);
+            bool isPoint = !elementLocation.IsEmpty;
+
+            if (isPoint)
+            {
+                Point hotSpotPoint = Projection.ToPoint(elementLocation, VisualExtent);
+                Size pointSize = element.DesiredSize;
+
+                // Until I add HotSpot support, center over the point
+                Rect destRect = new Rect(hotSpotPoint, pointSize);
+                destRect.X -= pointSize.Width / 2;
+                destRect.Y -= pointSize.Height / 2;
+
+                element.Arrange(destRect);
+            }
+
+            return isPoint;
+        }
+
         private void ChildrenCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.OldItems != null)
             {
-                foreach (MapLayer layer in e.OldItems)
+                foreach (UIElement child in e.OldItems)
                 {
-                    UnbindChild(layer);
+                    UnbindChild(child);
                 }
             }
 
             if (e.NewItems != null)
             {
-                foreach (MapLayer layer in e.NewItems)
+                foreach (UIElement child in e.NewItems)
                 {
-                    BindChild(layer);
+                    BindChild(child);
                 }
             }
         }
 
-        private void BindChild(MapLayer layer)
+        private void BindChild(UIElement child)
         {
-            throw new NotImplementedException();
+            // Stuff needed to manage the child will be bound here
+            //throw new NotImplementedException();
         }
 
-        private void UnbindChild(MapLayer layer)
+        private void UnbindChild(UIElement child)
         {
-            throw new NotImplementedException();
+            // Stuff needed to manage the child will be unbound here
+            //throw new NotImplementedException();
         }
     }
 }
