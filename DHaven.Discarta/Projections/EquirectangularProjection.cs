@@ -51,7 +51,7 @@ namespace DHaven.DisCarta.Projections
             }
         }
 
-        public GeoArea World { get { return new GeoArea(90, -180, -90, 180); } }
+        public GeoArea World { get { return new GeoArea(90, 180, -90, -180); } }
 
         public Size FullMapSizeFor(int zoomLevel)
         {
@@ -67,19 +67,23 @@ namespace DHaven.DisCarta.Projections
 
         public GeoPoint ToGeoPoint(Point point, Extent mapView)
         {
+            Size mapSize = FullMapSizeFor(mapView.ZoomLevel);
+
             return new GeoPoint
             {
-                Latitude = ToLat(point.Y, mapView),
-                Longitude = ToLon(point.X, mapView)
+                Latitude = ToLat(point.Y, mapView.Area.Size, mapSize),
+                Longitude = ToLon(point.X, mapView.Area.Size, mapSize)
             };
         }
 
         public Point ToPoint(GeoPoint point, Extent mapView)
         {
+            Size mapSize = FullMapSizeFor(mapView.ZoomLevel);
+
             return new Point
             {
-                X = ToX(point.Longitude, mapView),
-                Y = ToY(point.Latitude, mapView)
+                X = ToX(point.Longitude, mapView.Area.Size, mapSize),
+                Y = ToY(point.Latitude, mapView.Area.Size, mapSize)
             };
         }
 
@@ -88,24 +92,26 @@ namespace DHaven.DisCarta.Projections
             return new Rect(ToPoint(extent.NorthWest, mapView), ToPoint(extent.SouthEast, mapView));
         }
 
-        private double ToX(double longitude, Extent mapView)
+        private double ToX(double longitude, GeoVector extentSize, Size pixelArea)
         {
-            return longitude * (mapView.Screen.Width / mapView.Area.Size.DeltaLongitude);
+            // Shift the longitude so that is always positive.
+            return (longitude + 180) * (pixelArea.Width / extentSize.DeltaLongitude);
         }
 
-        private double ToY(double latitude, Extent mapView)
+        private double ToY(double latitude, GeoVector extentSize, Size pixelArea)
         {
-            return latitude * (mapView.Screen.Height / mapView.Area.Size.DeltaLatitude);
+            // Flip latitude coordinates and shift so that it is always visible
+            return (90 - latitude) * (pixelArea.Height / extentSize.DeltaLatitude);
         }
 
-        private double ToLon(double x, Extent mapView)
+        private double ToLon(double x, GeoVector extentSize, Size pixelArea)
         {
-            return x * (mapView.Area.Size.DeltaLongitude / mapView.Screen.Width);
+            return x * (extentSize.DeltaLongitude / pixelArea.Width);
         }
 
-        private double ToLat(double y, Extent mapView)
+        private double ToLat(double y, GeoVector extentSize, Size pixelArea)
         {
-            return y * (mapView.Area.Size.DeltaLatitude / mapView.Screen.Height);
+            return y * (extentSize.DeltaLatitude / pixelArea.Height);
         }
     }
 }

@@ -25,7 +25,7 @@ namespace DHaven.DisCarta
 {
     public class Map : Panel
     {
-        public static readonly DependencyProperty ProjectionProperty = DependencyProperty.RegisterAttached("Projection", typeof(IProjection), typeof(Map), new FrameworkPropertyMetadata(new PseudoMercatorProjection(), FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
+        public static readonly DependencyProperty ProjectionProperty = DependencyProperty.RegisterAttached("Projection", typeof(IProjection), typeof(Map), new FrameworkPropertyMetadata(new EquirectangularProjection(), FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
         public static readonly DependencyProperty ExtentProperty = DependencyProperty.RegisterAttached("ExtentProperty", typeof(Extent), typeof(Map), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, VisualExtentChanged));
 
         private bool loading = true;
@@ -45,7 +45,7 @@ namespace DHaven.DisCarta
             int desiredZoomLevel = -1;
             Size mapSize = Size.Empty;
 
-            while(mapSize.Width < ActualWidth && mapSize.Height < ActualHeight)
+            while(mapSize.Width < ActualWidth || mapSize.Height < ActualHeight)
             {
                 desiredZoomLevel++;
                 mapSize = Projection.FullMapSizeFor(desiredZoomLevel);
@@ -54,7 +54,6 @@ namespace DHaven.DisCarta
             Extent = new Extent
             {
                 Area = Projection.World,
-                Screen = new Size(ActualWidth, ActualHeight),
                 ZoomLevel = desiredZoomLevel
             };
         }
@@ -180,15 +179,9 @@ namespace DHaven.DisCarta
             }
 
             Extent newExtent = args.NewValue as Extent;
-            if (newExtent == null)
-            {
-                map.SizeChanged -= map.MapSizeChanged;
-            }
-            else
+            if (newExtent != null)
             {
                 newExtent.PropertyChanged += map.VisualExtentValuesChanged;
-
-                map.SizeChanged += map.MapSizeChanged;
             }
         }
 
@@ -202,11 +195,6 @@ namespace DHaven.DisCarta
             }
 
             InvalidateArrange();
-        }
-
-        private void MapSizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            Extent.Screen = new Size(ActualWidth, ActualHeight);
         }
 
         private void ChildrenCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)

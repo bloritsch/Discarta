@@ -24,7 +24,6 @@ namespace DHaven.DisCarta
     {
         private GeoArea extent;
         private int zoomLevel;
-        private Size screen;
 
         /// <summary>
         /// Gets or sets the geographic extent of the map.
@@ -54,22 +53,6 @@ namespace DHaven.DisCarta
                 {
                     zoomLevel = value;
                     RaisePropertyChanged(nameof(ZoomLevel));
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the screen size of the map in display units.
-        /// </summary>
-        public Size Screen
-        {
-            get { return screen; }
-            set
-            {
-                if (screen != value)
-                {
-                    screen = value;
-                    RaisePropertyChanged(nameof(Screen));
                 }
             }
         }

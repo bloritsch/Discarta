@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:DHaven.ExampleClient"
         xmlns:DisCarta="clr-namespace:DHaven.DisCarta;assembly=DHaven.DisCarta"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="1024" Width="1024">
     <Window.Resources>
         <DisCarta:GeoArea x:Key="World">
             <DisCarta:GeoArea.NorthWest>
