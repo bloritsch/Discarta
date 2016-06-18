@@ -23,6 +23,11 @@
             <ColumnDefinition/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
+        <TextBlock Grid.Column="0" Panel.ZIndex="100" VerticalAlignment="Bottom" HorizontalAlignment="Center" FontFamily="Segue UI" FontSize="24" Foreground="LimeGreen" Text="Psuedo Mercator (online maps)">
+            <TextBlock.Effect>
+                <DropShadowEffect ShadowDepth="2"/>
+            </TextBlock.Effect>
+        </TextBlock>
         <DisCarta:Map Grid.Column="0">
             <DisCarta:Map.Projection>
                 <Projections:PseudoMercatorProjection/>
@@ -31,6 +36,11 @@
                 <Image Source="World.png" DisCarta:Geo.Area="{StaticResource World}"/>
             </DisCarta:MapLayer>
         </DisCarta:Map>
+        <TextBlock Grid.Column="1" Panel.ZIndex="100" VerticalAlignment="Bottom" HorizontalAlignment="Center" FontFamily="Segue UI" FontSize="24" Foreground="LimeGreen" Text="Equirectangular">
+            <TextBlock.Effect>
+                <DropShadowEffect ShadowDepth="2"/>
+            </TextBlock.Effect>
+        </TextBlock>
         <DisCarta:Map Grid.Column="1">
             <DisCarta:Map.Projection>
                 <Projections:EquirectangularProjection/>

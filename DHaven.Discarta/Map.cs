@@ -120,8 +120,12 @@ namespace DHaven.DisCarta
             }
 
             Rect viewRect = Projection.ToRect(Extent.Area, Extent);
-            viewRect.X = viewRect.Size.Width < ActualWidth ? (ActualWidth - viewRect.Width) / 2 : viewRect.X;
-            viewRect.Y = viewRect.Size.Height < ActualHeight ? (ActualHeight - viewRect.Height) / 2 : viewRect.Y;
+            //viewRect.X = viewRect.Size.Width < ActualWidth ? (ActualWidth - viewRect.Width) / 2 : viewRect.X;
+            //viewRect.Y = viewRect.Size.Height < ActualHeight ? (ActualHeight - viewRect.Height) / 2 : viewRect.Y;
+
+            // for now let's always center it (view port support is comming)
+            viewRect.X = (ActualWidth - viewRect.Width) / 2;
+            viewRect.Y = (ActualHeight - viewRect.Height) / 2;
 
             foreach (UIElement child  in InternalChildren)
             {
