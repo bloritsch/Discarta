@@ -28,26 +28,30 @@
                 <DropShadowEffect ShadowDepth="2"/>
             </TextBlock.Effect>
         </TextBlock>
-        <DisCarta:Map Grid.Column="0">
+        <ScrollViewer Grid.Column="0" CanContentScroll="True">
+        <DisCarta:Map>
             <DisCarta:Map.Projection>
                 <Projections:PseudoMercatorProjection/>
             </DisCarta:Map.Projection>
-            <DisCarta:MapLayer Background="Blue">
+            <DisCarta:MapLayer Background="LightSteelBlue">
                 <Image Source="World.png" DisCarta:Geo.Area="{StaticResource World}"/>
             </DisCarta:MapLayer>
         </DisCarta:Map>
+        </ScrollViewer>
         <TextBlock Grid.Column="1" Panel.ZIndex="100" VerticalAlignment="Bottom" HorizontalAlignment="Center" FontFamily="Segue UI" FontSize="24" Foreground="LimeGreen" Text="Equirectangular">
             <TextBlock.Effect>
                 <DropShadowEffect ShadowDepth="2"/>
             </TextBlock.Effect>
         </TextBlock>
-        <DisCarta:Map Grid.Column="1">
+        <ScrollViewer Grid.Column="1" CanContentScroll="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+        <DisCarta:Map>
             <DisCarta:Map.Projection>
                 <Projections:EquirectangularProjection/>
             </DisCarta:Map.Projection>
-            <DisCarta:MapLayer Background="Blue">
+            <DisCarta:MapLayer Background="LightSteelBlue">
                 <Image Source="World.png" DisCarta:Geo.Area="{StaticResource World}"/>
             </DisCarta:MapLayer>
         </DisCarta:Map>
+        </ScrollViewer>
     </Grid>
 </Window>
