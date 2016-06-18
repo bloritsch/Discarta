@@ -18,7 +18,7 @@ using System.Windows;
 
 namespace DHaven.DisCarta.Projections
 {
-    class PseudoMercatorProjection : IProjection
+    public class PseudoMercatorProjection : IProjection
     {
         private const double K = 128 / Math.PI;
 

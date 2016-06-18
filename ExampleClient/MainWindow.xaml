@@ -5,8 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DHaven.ExampleClient"
         xmlns:DisCarta="clr-namespace:DHaven.DisCarta;assembly=DHaven.DisCarta"
+        xmlns:Projections="clr-namespace:DHaven.DisCarta;assembly=DHaven.DisCarta.Projections"
         mc:Ignorable="d"
-        Title="MainWindow" Height="1024" Width="1024">
+        Title="MainWindow" Height="512" Width="1024">
     <Window.Resources>
         <DisCarta:GeoArea x:Key="World">
             <DisCarta:GeoArea.NorthWest>
@@ -18,7 +19,22 @@
         </DisCarta:GeoArea>
     </Window.Resources>
     <Grid>
-        <DisCarta:Map>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <DisCarta:Map Grid.Column="0">
+            <DisCarta:Map.Projection>
+                <Projections:PseudoMercatorProjection/>
+            </DisCarta:Map.Projection>
+            <DisCarta:MapLayer Background="Blue">
+                <Image Source="World.png" DisCarta:Geo.Area="{StaticResource World}"/>
+            </DisCarta:MapLayer>
+        </DisCarta:Map>
+        <DisCarta:Map Grid.Column="1">
+            <DisCarta:Map.Projection>
+                <Projections:EquirectangularProjection/>
+            </DisCarta:Map.Projection>
             <DisCarta:MapLayer Background="Blue">
                 <Image Source="World.png" DisCarta:Geo.Area="{StaticResource World}"/>
             </DisCarta:MapLayer>
