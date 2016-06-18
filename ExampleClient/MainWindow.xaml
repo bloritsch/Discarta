@@ -7,9 +7,21 @@
         xmlns:DisCarta="clr-namespace:DHaven.DisCarta;assembly=DHaven.DisCarta"
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
+    <Window.Resources>
+        <DisCarta:GeoArea x:Key="World">
+            <DisCarta:GeoArea.NorthWest>
+                <DisCarta:GeoPoint Latitude="85.051129" Longitude="-180"/>
+            </DisCarta:GeoArea.NorthWest>
+            <DisCarta:GeoArea.Size>
+                <DisCarta:GeoVector DeltaLatitude="170.102258" DeltaLongitude="360"/>
+            </DisCarta:GeoArea.Size>
+        </DisCarta:GeoArea>
+    </Window.Resources>
     <Grid>
         <DisCarta:Map>
-            <DisCarta:MapLayer Background="Blue"/>
+            <DisCarta:MapLayer Background="Blue">
+                <Image Source="World.png" DisCarta:Geo.Area="{StaticResource World}"/>
+            </DisCarta:MapLayer>
         </DisCarta:Map>
     </Grid>
 </Window>

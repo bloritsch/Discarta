@@ -40,12 +40,12 @@ namespace DHaven.DisCarta
         /// <summary>
         /// Gets or sets the latitude in degrees for the WGS84 spheriod.
         /// </summary>
-        public double Latitude;
+        public double Latitude { get; set; }
 
         /// <summary>
         /// Gets or sets the longitude in degrees for the WGS84 spheriod.
         /// </summary>
-        public double Longitude;
+        public double Longitude { get; set; }
 
         /// <summary>
         /// Gets whether the point is Empty.

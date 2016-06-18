@@ -31,8 +31,8 @@ namespace DHaven.DisCarta
             DeltaLongitude = deltaLon;
         }
 
-        public double DeltaLatitude;
-        public double DeltaLongitude;
+        public double DeltaLatitude { get; set; }
+        public double DeltaLongitude { get; set; }
 
         public bool IsEmpty { get { return double.IsNaN(DeltaLatitude) || double.IsNaN(DeltaLongitude); } }
 

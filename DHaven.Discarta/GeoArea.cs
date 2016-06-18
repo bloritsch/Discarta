@@ -20,14 +20,16 @@ namespace DHaven.DisCarta
     public struct GeoArea : IEquatable<GeoArea>
     {
         public static readonly GeoArea Empty = new GeoArea(GeoPoint.Empty, GeoVector.Empty);
+        private GeoPoint northWest;
+        private GeoVector size;
 
-        public GeoArea(double north, double east, double south, double west)
+        public GeoArea(double north, double east, double south, double west) : this()
         {
             NorthWest = new GeoPoint(north, west);
             Size = new GeoVector(north - south, east - west);
         }
 
-        public GeoArea(GeoPoint northWestIn, GeoVector dimensionsIn)
+        public GeoArea(GeoPoint northWestIn, GeoVector dimensionsIn) : this()
         {
             nameof(northWestIn).ThrowIfNull(northWestIn);
 
@@ -35,7 +37,7 @@ namespace DHaven.DisCarta
             Size = dimensionsIn;
         }
 
-        public GeoArea(params GeoPoint[] pointsInExtent)
+        public GeoArea(params GeoPoint[] pointsInExtent) : this()
         {
             if (pointsInExtent.Length == 0)
             {
@@ -62,8 +64,23 @@ namespace DHaven.DisCarta
             }
         }
 
-        public GeoPoint NorthWest;
-        public GeoVector Size;
+        /// <summary>
+        /// Gets or sets the anchor position (top left, or north west).
+        /// </summary>
+        public GeoPoint NorthWest
+        {
+            get { return northWest; }
+            set { northWest = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the dimensions of this geo area.
+        /// </summary>
+        public GeoVector Size
+        {
+            get { return size; }
+            set { size = value; }
+        }
 
         public bool IsEmpty { get { return NorthWest.IsEmpty || Size.IsEmpty; } }
 
@@ -122,10 +139,10 @@ namespace DHaven.DisCarta
         public void Expand(GeoVector dimensions)
         {
             // Split the difference so that the center doesn't change.
-            NorthWest.Latitude -= dimensions.DeltaLatitude / 2;
-            NorthWest.Longitude -= dimensions.DeltaLongitude / 2;
-            Size.DeltaLatitude += dimensions.DeltaLatitude / 2;
-            Size.DeltaLongitude += dimensions.DeltaLongitude / 2;
+            northWest.Latitude -= dimensions.DeltaLatitude / 2;
+            northWest.Longitude -= dimensions.DeltaLongitude / 2;
+            size.DeltaLatitude += dimensions.DeltaLatitude / 2;
+            size.DeltaLongitude += dimensions.DeltaLongitude / 2;
         }
 
         public override string ToString()
