@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DHaven.ExampleClient"
         xmlns:DisCarta="clr-namespace:DHaven.DisCarta;assembly=DHaven.DisCarta"
-        xmlns:Projections="clr-namespace:DHaven.DisCarta;assembly=DHaven.DisCarta.Projections"
+        xmlns:Projections="clr-namespace:DHaven.DisCarta.Projections;assembly=DHaven.DisCarta"
         mc:Ignorable="d"
         Title="MainWindow" Height="512" Width="1024">
     <Window.Resources>
