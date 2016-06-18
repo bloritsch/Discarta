@@ -360,7 +360,7 @@ namespace DHaven.DisCarta
 
         public void SetHorizontalOffset(double offset)
         {
-            offset = Math.Max(0, Math.Min(offset, ExtentWidth - ViewportWidth));
+            offset = -Math.Max(0, Math.Min(offset, ExtentWidth - ViewportWidth));
             if (offset != viewOffset.X)
             {
                 viewOffset.X = offset;
@@ -371,7 +371,7 @@ namespace DHaven.DisCarta
 
         public void SetVerticalOffset(double offset)
         {
-            offset = Math.Max(0, Math.Min(offset, ExtentHeight - ViewportHeight));
+            offset = -Math.Max(0, Math.Min(offset, ExtentHeight - ViewportHeight));
             if (offset != viewOffset.Y)
             {
                 viewOffset.Y = offset;
