@@ -28,7 +28,7 @@
                 <DropShadowEffect ShadowDepth="2"/>
             </TextBlock.Effect>
         </TextBlock>
-        <ScrollViewer Grid.Column="0" CanContentScroll="True">
+        <ScrollViewer Grid.Column="0" CanContentScroll="True" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden">
         <DisCarta:Map>
             <DisCarta:Map.Projection>
                 <Projections:PseudoMercatorProjection/>
@@ -43,7 +43,7 @@
                 <DropShadowEffect ShadowDepth="2"/>
             </TextBlock.Effect>
         </TextBlock>
-        <ScrollViewer Grid.Column="1" CanContentScroll="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+        <ScrollViewer Grid.Column="1" CanContentScroll="True" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden">
         <DisCarta:Map>
             <DisCarta:Map.Projection>
                 <Projections:EquirectangularProjection/>

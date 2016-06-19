@@ -17,10 +17,20 @@ using DHaven.DisCarta.Internals;
 using System.Collections.Specialized;
 using System.Windows;
 using System.Windows.Controls;
+using System;
+using System.Windows.Media;
+using System.Windows.Data;
 
 namespace DHaven.DisCarta
 {
-    public class MapLayer : Panel
+    /// <summary>
+    /// Will be taking lessons from here:
+    /// https://blogs.msdn.microsoft.com/dancre/2006/02/06/implementing-a-virtualized-panel-in-wpf-avalon/
+    /// https://blogs.msdn.microsoft.com/dancre/2006/02/13/implementing-a-virtualizingpanel-part-2-iitemcontainergenerator/
+    /// https://blogs.msdn.microsoft.com/dancre/2006/02/15/implementing-a-virtualizingpanel-part-3-measurecore/
+    /// https://blogs.msdn.microsoft.com/dancre/2006/02/17/implementing-a-virtualizingpanel-part-4-the-goods/
+    /// </summary>
+    public class MapLayer : VirtualizingPanel
     {
         public IProjection Projection
         {
@@ -69,7 +79,11 @@ namespace DHaven.DisCarta
                     isPlaced = PlaceIfPoint(child);
                 }
 
-                // TODO: canvas positioning for non geographic elements.
+                if (!isPlaced)
+                {
+                    // If this isn't a map element, hide it.
+                    child.Arrange(Rect.Empty);
+                }
             }
 
             return renderSize;
@@ -132,13 +146,18 @@ namespace DHaven.DisCarta
         private void BindChild(UIElement child)
         {
             // Stuff needed to manage the child will be bound here
-            //throw new NotImplementedException();
+            BindingOperations.SetBinding(child, Map.ProjectionProperty, new Binding
+            {
+                Source = this,
+                Path = new PropertyPath(Map.ProjectionProperty),
+                Mode = BindingMode.OneWay
+            });
         }
 
         private void UnbindChild(UIElement child)
         {
             // Stuff needed to manage the child will be unbound here
-            //throw new NotImplementedException();
+            BindingOperations.ClearBinding(child, Map.ProjectionProperty);
         }
     }
 }

@@ -24,6 +24,7 @@ using System.Windows.Controls.Primitives;
 using System;
 using System.Windows.Media;
 using System.Windows.Input;
+using System.Linq;
 
 namespace DHaven.DisCarta
 {
@@ -168,6 +169,9 @@ namespace DHaven.DisCarta
 
             if (extentOrViewChanged && ScrollOwner != null)
             {
+                CanHorizontallyScroll = ExtentWidth > ViewportWidth;
+                CanVerticallyScroll = ExtentHeight > ViewportHeight;
+
                 ScrollOwner.InvalidateScrollInfo();
             }
 
@@ -296,12 +300,12 @@ namespace DHaven.DisCarta
 
         public void LineUp()
         {
-            SetVerticalOffset(VerticalOffset + LineSize);
+            SetVerticalOffset(VerticalOffset - LineSize);
         }
 
         public void LineDown()
         {
-            SetVerticalOffset(VerticalOffset - LineSize);
+            SetVerticalOffset(VerticalOffset + LineSize);
         }
 
         public void LineLeft()
@@ -311,7 +315,7 @@ namespace DHaven.DisCarta
 
         public void LineRight()
         {
-            SetHorizontalOffset(HorizontalOffset - LineSize);
+            SetHorizontalOffset(HorizontalOffset + LineSize);
         }
 
         public void PageUp()
@@ -364,7 +368,6 @@ namespace DHaven.DisCarta
             if (offset != viewOffset.X)
             {
                 viewOffset.X = offset;
-                CanHorizontallyScroll = ExtentWidth > ViewportWidth;
                 InvalidateArrange();
             }
         }
@@ -375,15 +378,19 @@ namespace DHaven.DisCarta
             if (offset != viewOffset.Y)
             {
                 viewOffset.Y = offset;
-                CanVerticallyScroll = ExtentHeight > ViewportHeight;
                 InvalidateArrange();
             }
         }
 
         public Rect MakeVisible(Visual visual, Rect rectangle)
         {
-            // Called to make a visual available, but that has to be handled in the MapLayer area.
-            return Rect.Empty;
+            // We'll just assume the source Rect is correct for now.
+            // When we actually get to placing things on screen
+            // we'll fix this.
+            Rect mapRect = new Rect(scrollExtent);
+            rectangle.Intersect(mapRect);
+
+            return rectangle;
         }
     }
 }
