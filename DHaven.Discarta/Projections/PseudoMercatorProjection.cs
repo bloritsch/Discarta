@@ -86,6 +86,11 @@ namespace DHaven.DisCarta.Projections
             };
         }
 
+        public Rect ToRect(Extent mapView)
+        {
+            return new Rect(ToPoint(mapView.Area.NorthWest, mapView), ToPoint(mapView.Area.SouthEast, mapView));
+        }
+
         public Rect ToRect(GeoArea extent, Extent mapView)
         {
             return new Rect(ToPoint(extent.NorthWest, mapView), ToPoint(extent.SouthEast, mapView));

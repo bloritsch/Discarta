@@ -87,6 +87,11 @@ namespace DHaven.DisCarta.Projections
             };
         }
 
+        public Rect ToRect(Extent mapView)
+        {
+            return new Rect(ToPoint(mapView.Area.NorthWest, mapView), ToPoint(mapView.Area.SouthEast, mapView));
+        }
+
         public Rect ToRect(GeoArea extent, Extent mapView)
         {
             return new Rect(ToPoint(extent.NorthWest, mapView), ToPoint(extent.SouthEast, mapView));
@@ -106,12 +111,12 @@ namespace DHaven.DisCarta.Projections
 
         private double ToLon(double x, GeoVector extentSize, Size pixelArea)
         {
-            return x * (extentSize.DeltaLongitude / pixelArea.Width);
+            return x * (extentSize.DeltaLongitude / pixelArea.Width) - 180;
         }
 
         private double ToLat(double y, GeoVector extentSize, Size pixelArea)
         {
-            return y * (extentSize.DeltaLatitude / pixelArea.Height);
+            return y * (extentSize.DeltaLatitude / pixelArea.Height) - 90;
         }
     }
 }

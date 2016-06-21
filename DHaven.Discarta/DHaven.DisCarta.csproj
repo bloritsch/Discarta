@@ -54,10 +54,12 @@
     <Compile Include="IProjection.cs" />
     <Compile Include="Map.cs" />
     <Compile Include="MapLayer.cs" />
-    <Compile Include="VisualExtent.cs" />
+    <Compile Include="Tiles\ITileManager.cs" />
+    <Compile Include="Extent.cs" />
     <Compile Include="Projections\EquirectangularProjection.cs" />
     <Compile Include="Projections\PseudoMercatorProjection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tiles\RenderingTileManager.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

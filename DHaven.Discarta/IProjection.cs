@@ -56,6 +56,14 @@ namespace DHaven.DisCarta
         Point ToPoint(GeoPoint point, Extent mapView);
 
         /// <summary>
+        /// Return the rect that is used to represent
+        /// the full extent's area.
+        /// </summary>
+        /// <param name="mapView">the current map view</param>
+        /// <returns>the placement rect</returns>
+        Rect ToRect(Extent mapView);
+
+        /// <summary>
         /// Convert a GeoArea to a placement Rect.
         /// </summary>
         /// <param name="extent">the GeoArea to convert</param>

@@ -21,7 +21,7 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
-            <ColumnDefinition/>
+            <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
         <TextBlock Grid.Column="0" Panel.ZIndex="100" VerticalAlignment="Bottom" HorizontalAlignment="Center" FontFamily="Segue UI" FontSize="24" Foreground="LimeGreen" Text="Psuedo Mercator (online maps)">
             <TextBlock.Effect>
@@ -34,7 +34,7 @@
                 <Projections:PseudoMercatorProjection/>
             </DisCarta:Map.Projection>
             <DisCarta:MapLayer Background="LightSteelBlue">
-                <Image Source="World.png" DisCarta:Geo.Area="{StaticResource World}"/>
+                <Image Source="World.png" Stretch="Fill" DisCarta:Geo.Area="{StaticResource World}"/>
             </DisCarta:MapLayer>
         </DisCarta:Map>
         </ScrollViewer>
@@ -49,7 +49,7 @@
                 <Projections:EquirectangularProjection/>
             </DisCarta:Map.Projection>
             <DisCarta:MapLayer Background="LightSteelBlue">
-                <Image Source="World.png" DisCarta:Geo.Area="{StaticResource World}"/>
+                <Image Source="World.png" Stretch="Fill" DisCarta:Geo.Area="{StaticResource World}"/>
             </DisCarta:MapLayer>
         </DisCarta:Map>
         </ScrollViewer>

@@ -25,6 +25,10 @@ using System;
 using System.Windows.Media;
 using System.Windows.Input;
 using System.Linq;
+using DHaven.DisCarta.Tiles;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Windows.Shapes;
 
 namespace DHaven.DisCarta
 {
@@ -35,18 +39,19 @@ namespace DHaven.DisCarta
         public static readonly DependencyProperty ProjectionProperty = DependencyProperty.RegisterAttached("Projection", typeof(IProjection), typeof(Map), new FrameworkPropertyMetadata(new EquirectangularProjection(), FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
         public static readonly DependencyProperty ExtentProperty = DependencyProperty.RegisterAttached("ExtentProperty", typeof(Extent), typeof(Map), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, VisualExtentChanged));
 
-        private Vector viewOffset;
-        private Size scrollExtent;
-        private Size viewPort;
+        private Rect mapRect;
+        private Rect viewPort;
         private bool loading = true;
+        private ITileManager tileManager;
 
         public Map()
         {
+            tileManager = new RenderingTileManager();
             Loaded += MapLoaded;
             ClipToBounds = true;
         }
 
-        private void MapLoaded(object sender, RoutedEventArgs e)
+        private async void MapLoaded(object sender, RoutedEventArgs e)
         {
             Loaded -= MapLoaded;
             loading = false;
@@ -76,6 +81,32 @@ namespace DHaven.DisCarta
             {
                 ScrollOwner.InvalidateScrollInfo();
             }
+
+            List<Task<Drawing>> tiles = tileManager.GetTilesForArea(Projection, Extent).ToList();
+            while (tiles.Any())
+            {
+                await Task.WhenAny(tiles);
+                
+                foreach(Task<Drawing> finishedDrawing in tiles.Where(t=>t.IsCompleted).ToList())
+                {
+                    Drawing tileContent = await finishedDrawing;
+                    Rectangle visual = new Rectangle();
+                    Geo.SetArea(visual, Geo.GetArea(tileContent));
+
+                    DrawingBrush brush = new DrawingBrush
+                    {
+                        Drawing = tileContent,
+                        Stretch = Stretch.Fill
+                    };
+
+                    brush.Freeze();
+                    visual.Fill = brush;
+                    SetZIndex(visual, int.MinValue);
+
+                    Children.Add(visual);
+                    tiles.Remove(finishedDrawing);
+                }
+            }
         }
 
         public IProjection Projection
@@ -96,12 +127,12 @@ namespace DHaven.DisCarta
 
         public double ExtentWidth
         {
-            get { return scrollExtent.Width; }
+            get { return mapRect.Width; }
         }
 
         public double ExtentHeight
         {
-            get { return scrollExtent.Height; }
+            get { return mapRect.Height; }
         }
 
         public double ViewportWidth
@@ -116,12 +147,12 @@ namespace DHaven.DisCarta
 
         public double HorizontalOffset
         {
-            get { return viewOffset.X; }
+            get { return -viewPort.X; }
         }
 
         public double VerticalOffset
         {
-            get { return viewOffset.Y; }
+            get { return -viewPort.Y; }
         }
 
         public ScrollViewer ScrollOwner { get; set; }
@@ -155,15 +186,15 @@ namespace DHaven.DisCarta
 
             Size extent = Projection.FullMapSizeFor(Extent.ZoomLevel);
             bool extentOrViewChanged = false;
-            if (extent != scrollExtent)
+            if (extent != mapRect.Size)
             {
-                scrollExtent = extent;
+                mapRect = new Rect(extent);
                 extentOrViewChanged = true;
             }
 
-            if (availableSize != viewPort)
+            if (availableSize != viewPort.Size)
             {
-                viewPort = availableSize;
+                viewPort.Size = availableSize;
                 extentOrViewChanged = true;
             }
 
@@ -177,8 +208,8 @@ namespace DHaven.DisCarta
 
             foreach (UIElement child in InternalChildren)
             {
-                Size desiredSize = child is MapLayer ? scrollExtent : new Size();
-                child.Measure(scrollExtent);
+                Size desiredSize = child is MapLayer ? mapRect.Size : new Size();
+                child.Measure(mapRect.Size);
             }
 
             return availableSize;
@@ -191,9 +222,9 @@ namespace DHaven.DisCarta
                 return finalSize;
             }
 
-            if (finalSize != viewPort)
+            if (finalSize != viewPort.Size)
             {
-                viewPort = finalSize;
+                viewPort.Size = finalSize;
 
                 if (ScrollOwner != null)
                 {
@@ -202,16 +233,24 @@ namespace DHaven.DisCarta
             }
 
             Rect viewRect = Projection.ToRect(Extent.Area, Extent);
-            viewRect.X = -HorizontalOffset;
-            viewRect.Y = -VerticalOffset;
+            viewRect.X = viewPort.X;
+            viewRect.Y = viewPort.Y;
 
             foreach (UIElement child  in InternalChildren)
             {
-                Rect placement = child is MapLayer ? viewRect : new Rect();
+                Rect placement = viewRect;
+
+                if(! (child is MapLayer))
+                {
+                    placement = Projection.ToRect(Geo.GetArea(child), Extent);
+                    placement.X += viewPort.X;
+                    placement.Y += viewPort.Y;
+                }
+
                 child.Arrange(placement);
             }
 
-            return viewPort;
+            return viewPort.Size;
         }
 
         protected override UIElementCollection CreateUIElementCollection(FrameworkElement logicalParent)
@@ -224,6 +263,11 @@ namespace DHaven.DisCarta
 
         private void BindLayer(MapLayer child)
         {
+            if (child == null)
+            {
+                return;
+            }
+
             child.SetBinding(ProjectionProperty, new Binding
             {
                 Source = this,
@@ -241,6 +285,11 @@ namespace DHaven.DisCarta
 
         private void UnbindLayer(MapLayer child)
         {
+            if (child == null)
+            {
+                return;
+            }
+
             BindingOperations.ClearBinding(child, ProjectionProperty);
             BindingOperations.ClearBinding(child, ExtentProperty);
         }
@@ -283,17 +332,17 @@ namespace DHaven.DisCarta
         {
             if(e.OldItems != null)
             {
-                foreach(MapLayer layer in e.OldItems)
+                foreach(UIElement child in e.OldItems)
                 {
-                    UnbindLayer(layer);
+                    UnbindLayer(child as MapLayer);
                 }
             }
 
             if(e.NewItems != null)
             {
-                foreach(MapLayer layer in e.NewItems)
+                foreach(UIElement child in e.NewItems)
                 {
-                    BindLayer(layer);
+                    BindLayer(child as MapLayer);
                 }
             }
         }
@@ -364,20 +413,20 @@ namespace DHaven.DisCarta
 
         public void SetHorizontalOffset(double offset)
         {
-            offset = Math.Max(0, Math.Min(offset, ExtentWidth - ViewportWidth));
-            if (offset != viewOffset.X)
+            offset = -Math.Max(0, Math.Min(offset, ExtentWidth - ViewportWidth));
+            if (offset != viewPort.X)
             {
-                viewOffset.X = offset;
+                viewPort.X = offset;
                 InvalidateArrange();
             }
         }
 
         public void SetVerticalOffset(double offset)
         {
-            offset = Math.Max(0, Math.Min(offset, ExtentHeight - ViewportHeight));
-            if (offset != viewOffset.Y)
+            offset = -Math.Max(0, Math.Min(offset, ExtentHeight - ViewportHeight));
+            if (offset != viewPort.Y)
             {
-                viewOffset.Y = offset;
+                viewPort.Y = offset;
                 InvalidateArrange();
             }
         }
@@ -387,7 +436,6 @@ namespace DHaven.DisCarta
             // We'll just assume the source Rect is correct for now.
             // When we actually get to placing things on screen
             // we'll fix this.
-            Rect mapRect = new Rect(scrollExtent);
             rectangle.Intersect(mapRect);
 
             return rectangle;

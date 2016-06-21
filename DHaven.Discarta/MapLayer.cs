@@ -20,6 +20,7 @@ using System.Windows.Controls;
 using System;
 using System.Windows.Media;
 using System.Windows.Data;
+using System.Windows.Controls.Primitives;
 
 namespace DHaven.DisCarta
 {
@@ -54,7 +55,11 @@ namespace DHaven.DisCarta
 
         protected override Size MeasureOverride(Size availableSize)
         {
-            base.MeasureOverride(availableSize);
+            // Virtualizing Panel Responsibility: visual data I need
+            // Ensure the IItemContainerGenerator is initialized (not initialized until InternalChildren is accessed
+            // Not sure if still the case..... test
+            UIElementCollection children = base.InternalChildren;
+            IItemContainerGenerator generator = this.ItemContainerGenerator;
 
             Size desiredSize = Projection.FullMapSizeFor(VisualExtent.ZoomLevel);
 
@@ -62,6 +67,8 @@ namespace DHaven.DisCarta
             {
                 child.Measure(desiredSize);
             }
+
+            // Virtualizing Panel Responsibility: visual data to get rid of
 
             return desiredSize;
         }
