@@ -17,6 +17,7 @@
 namespace DHaven.DisCarta
 {
     using System;
+    using System.Runtime.InteropServices;
     using Internals;
 
     public struct GeoArea : IEquatable<GeoArea>
@@ -134,6 +135,15 @@ namespace DHaven.DisCarta
             northWest.Longitude -= dimensions.DeltaLongitude / 2;
             size.DeltaLatitude += dimensions.DeltaLatitude / 2;
             size.DeltaLongitude += dimensions.DeltaLongitude / 2;
+        }
+
+        public static GeoArea Intersection(GeoArea first, GeoArea second)
+        {
+            return new GeoArea(
+                Math.Min(first.NorthEast.Latitude, second.NorthEast.Latitude),
+                Math.Min(first.NorthEast.Longitude, second.NorthEast.Longitude),
+                Math.Max(first.SouthWest.Latitude, second.SouthWest.Latitude),
+                Math.Max(first.SouthWest.Longitude, second.SouthWest.Longitude));
         }
 
         public override string ToString()

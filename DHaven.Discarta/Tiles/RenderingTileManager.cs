@@ -25,6 +25,7 @@ namespace DHaven.DisCarta.Tiles
     {
         private Drawing RenderTile(IProjection projection, Rect currentTile, Extent mapArea)
         {
+            var degrees = CalculateDegreeLines(mapArea.ZoomLevel);
             var tileArea = projection.ToGeoArea(currentTile, mapArea);
 
             var drawing = new DrawingGroup();
@@ -37,18 +38,41 @@ namespace DHaven.DisCarta.Tiles
             {
                 context.PushClip(new RectangleGeometry(currentTile));
 
-                for (var lat = -90; lat <= 90; lat += 30)
+                var outerRect = projection.ToRect(projection.World, mapArea);
+                context.DrawRectangle(null, linePen, outerRect);
+
+                for (var lat = 0.0; lat <= projection.World.NorthEast.Latitude; lat += degrees)
                 {
-                    var start = projection.ToPoint(new GeoPoint(lat, 180), mapArea);
-                    var end = projection.ToPoint(new GeoPoint(lat, -180), mapArea);
+                    var start = projection.ToPoint(new GeoPoint(lat, projection.World.NorthEast.Longitude), mapArea);
+                    var end = projection.ToPoint(new GeoPoint(lat, projection.World.NorthWest.Longitude), mapArea);
+
+                    context.DrawLine(linePen, start, end);
+
+                    if (lat <= 0)
+                    {
+                        continue;
+                    }
+
+                    start = projection.ToPoint(new GeoPoint(-lat, projection.World.NorthEast.Longitude), mapArea);
+                    end = projection.ToPoint(new GeoPoint(-lat, projection.World.NorthWest.Longitude), mapArea);
 
                     context.DrawLine(linePen, start, end);
                 }
 
-                for (var lon = -180; lon <= 180; lon += 30)
+                for (var lon = 0.0; lon <= projection.World.NorthEast.Longitude; lon += degrees)
                 {
-                    var start = projection.ToPoint(new GeoPoint(-90, lon), mapArea);
-                    var end = projection.ToPoint(new GeoPoint(90, lon), mapArea);
+                    var start = projection.ToPoint(new GeoPoint(projection.World.NorthEast.Latitude, lon), mapArea);
+                    var end = projection.ToPoint(new GeoPoint(projection.World.SouthEast.Latitude, lon), mapArea);
+
+                    context.DrawLine(linePen, start, end);
+
+                    if (lon <= 0)
+                    {
+                        continue;
+                    }
+
+                    start = projection.ToPoint(new GeoPoint(projection.World.NorthEast.Latitude, -lon), mapArea);
+                    end = projection.ToPoint(new GeoPoint(projection.World.SouthEast.Latitude, -lon), mapArea);
 
                     context.DrawLine(linePen, start, end);
                 }
@@ -58,6 +82,26 @@ namespace DHaven.DisCarta.Tiles
 
             drawing.Freeze();
             return drawing;
+        }
+
+        private static double CalculateDegreeLines(int zoomLevel)
+        {
+            if (zoomLevel <= 1)
+            {
+                return 50;
+            }
+
+            if (zoomLevel <= 3)
+            {
+                return 30;
+            }
+
+            if (zoomLevel <= 6)
+            {
+                return 20;
+            }
+
+            return 10;
         }
 
         #region Implementations

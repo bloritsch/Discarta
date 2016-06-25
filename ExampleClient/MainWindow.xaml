@@ -11,10 +11,10 @@
     <Window.Resources>
         <DisCarta:GeoArea x:Key="World">
             <DisCarta:GeoArea.NorthWest>
-                <DisCarta:GeoPoint Latitude="85.051129" Longitude="-180" />
+                <DisCarta:GeoPoint Latitude="90" Longitude="-180" />
             </DisCarta:GeoArea.NorthWest>
             <DisCarta:GeoArea.Size>
-                <DisCarta:GeoVector DeltaLatitude="170.102258" DeltaLongitude="360" />
+                <DisCarta:GeoVector DeltaLatitude="180" DeltaLongitude="360" />
             </DisCarta:GeoArea.Size>
         </DisCarta:GeoArea>
     </Window.Resources>
@@ -36,7 +36,7 @@
                         <Projections:PseudoMercatorProjection />
                     </DisCarta:Map.Projection>
                     <DisCarta:MapLayer Background="LightSteelBlue">
-                        <Image Source="World.png" Stretch="Fill" DisCarta:Geo.Area="{StaticResource World}"/>
+                        <Image Source="World_geo.tif" Stretch="Fill" DisCarta:Geo.Area="{StaticResource World}"/>
                     </DisCarta:MapLayer>
                 </DisCarta:Map>
             </ScrollViewer>
@@ -54,7 +54,7 @@
                     <Projections:EquirectangularProjection />
                 </DisCarta:Map.Projection>
                 <DisCarta:MapLayer Background="LightSteelBlue">
-                    <Image Source="World.png" Stretch="Fill" DisCarta:Geo.Area="{StaticResource World}"/>
+                    <Image Source="World_geo.tif" Stretch="Fill" DisCarta:Geo.Area="{StaticResource World}"/>
                 </DisCarta:MapLayer>
             </DisCarta:Map>
         </ScrollViewer>

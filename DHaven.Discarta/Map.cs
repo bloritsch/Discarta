@@ -24,7 +24,6 @@ namespace DHaven.DisCarta
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Data;
-    using System.Windows.Input;
     using System.Windows.Media;
     using System.Windows.Shapes;
     using Internals;
@@ -45,6 +44,10 @@ namespace DHaven.DisCarta
             new FrameworkPropertyMetadata(null,
                 FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange,
                 VisualExtentChanged));
+
+        internal static readonly DependencyProperty OffsetProperty = DependencyProperty.RegisterAttached(
+            "Offset", typeof(Vector), typeof(Map),
+            new FrameworkPropertyMetadata(default(Vector), FrameworkPropertyMetadataOptions.AffectsArrange));
 
         private readonly ITileManager tileManager;
         private bool loading = true;
@@ -95,22 +98,19 @@ namespace DHaven.DisCarta
                 return finalSize;
             }
 
-            Vector offset = PanelExtent.TopLeft - ViewPort.TopLeft;
-
-            var viewRect = Projection.ToRect(Extent.Area, Extent);
-            viewRect.X += offset.X;
-            viewRect.Y += offset.Y;
+            var offset = PanelExtent.TopLeft - ViewPort.TopLeft;
 
             foreach (UIElement child  in InternalChildren)
             {
-                var placement = viewRect;
+                var placement = PanelExtent;
 
                 if (!(child is MapLayer))
                 {
                     placement = Projection.ToRect(Geo.GetArea(child), Extent);
-                    placement.X += offset.X;
-                    placement.Y += offset.Y;
                 }
+
+                placement.X += offset.X;
+                placement.Y += offset.Y;
 
                 child.Arrange(placement);
             }
@@ -150,18 +150,18 @@ namespace DHaven.DisCarta
 
         #region Overrides of ScrollablePanel
 
-        ///// <summary>
-        ///// Override this to perform work if the view port chnages size, etc.
-        ///// </summary>
-        //protected override void OnViewPortChanged()
-        //{
-        //    base.OnViewPortChanged();
+        /// <summary>
+        /// Override this to perform work if the view port chnages size, etc.
+        /// </summary>
+        protected override void OnViewPortChanged()
+        {
+            base.OnViewPortChanged();
 
-        //    if (Projection != null && Extent != null)
-        //    {
-        //        Extent.Area = Projection.ToGeoArea(ViewPort, Extent);
-        //    }
-        //}
+            if (Projection != null && Extent != null)
+            {
+                Extent.Area = Projection.ToGeoArea(ViewPort, Extent);
+            }
+        }
 
         #endregion
 
@@ -198,7 +198,7 @@ namespace DHaven.DisCarta
             }
         }
 
-        private void VisualExtentValuesChanged(object sender, PropertyChangedEventArgs e)
+        private async void VisualExtentValuesChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == string.Empty || e.PropertyName == nameof(Extent.ZoomLevel))
             {
@@ -209,58 +209,13 @@ namespace DHaven.DisCarta
                 InvalidateMeasure();
             }
 
-            // TODO: handle tile loading here!!!!
-
             ScrollOwner?.InvalidateScrollInfo();
             InvalidateArrange();
-        }
 
-        private void ChildrenCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            if (e.OldItems != null)
+            foreach (var child in InternalChildren.OfType<UIElement>().Where(c => !(c is MapLayer)).ToList())
             {
-                foreach (UIElement child in e.OldItems)
-                {
-                    UnbindLayer(child as MapLayer);
-                }
+                Children.Remove(child);
             }
-
-            if (e.NewItems != null)
-            {
-                foreach (UIElement child in e.NewItems)
-                {
-                    BindLayer(child as MapLayer);
-                }
-            }
-        }
-
-        private async void MapLoaded(object sender, RoutedEventArgs e)
-        {
-            Loaded -= MapLoaded;
-            loading = false;
-
-            // Size the map so it is big enough to cover the visible area
-
-            ViewPort.Size = new Size(ActualWidth, ActualHeight);
-            var desiredZoomLevel = -1;
-
-            while (ExtentWidth < ViewportWidth || ExtentHeight < ViewportHeight)
-            {
-                desiredZoomLevel++;
-                PanelExtent.Size = Projection.FullMapSizeFor(desiredZoomLevel);
-            }
-
-            Extent = new Extent
-            {
-                Area = Projection.World,
-                ZoomLevel = desiredZoomLevel
-            };
-
-            // for now let's always center it (view port support is comming)
-            SetHorizontalOffset((ExtentWidth - ViewportWidth) / 2);
-            SetVerticalOffset((ExtentHeight - ViewportHeight) / 2);
-
-            ScrollOwner?.InvalidateScrollInfo();
 
             var tiles = tileManager.GetTilesForArea(Projection, Extent).ToList();
             while (tiles.Any())
@@ -289,6 +244,55 @@ namespace DHaven.DisCarta
             }
         }
 
+        private void ChildrenCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.OldItems != null)
+            {
+                foreach (UIElement child in e.OldItems)
+                {
+                    UnbindLayer(child as MapLayer);
+                }
+            }
+
+            if (e.NewItems != null)
+            {
+                foreach (UIElement child in e.NewItems)
+                {
+                    BindLayer(child as MapLayer);
+                }
+            }
+        }
+
+        private void MapLoaded(object sender, RoutedEventArgs e)
+        {
+            Loaded -= MapLoaded;
+            loading = false;
+
+            // Size the map so it is big enough to cover the visible area
+
+            ViewPort.Size = new Size(ActualWidth, ActualHeight);
+            var desiredZoomLevel = -1;
+
+            while (ExtentWidth < ViewportWidth || ExtentHeight < ViewportHeight)
+            {
+                desiredZoomLevel++;
+                PanelExtent.Size = Projection.FullMapSizeFor(desiredZoomLevel);
+            }
+
+            Extent = new Extent
+            {
+                Area = Projection.World,
+                ZoomLevel = desiredZoomLevel
+            };
+
+            // for now let's always center it (view port support is comming)
+            SetHorizontalOffset((ExtentWidth - ViewportWidth) / 2);
+            SetVerticalOffset((ExtentHeight - ViewportHeight) / 2);
+
+            ScrollOwner?.InvalidateScrollInfo();
+            VisualExtentValuesChanged(this, new PropertyChangedEventArgs(string.Empty));
+        }
+
         #region Implementations
 
         public override Rect MakeVisible(Visual visual, Rect rectangle)
@@ -303,26 +307,13 @@ namespace DHaven.DisCarta
 
         public override void MouseWheelDown()
         {
-            var mousePosition = Mouse.GetPosition(this);
-            GeoPoint center;
-
-            if (mousePosition.X < 0 || mousePosition.Y < 0 || mousePosition.X > ViewportWidth
-                || mousePosition.Y > ViewportHeight)
-            {
-                // if the mouse is outside of the during mouse wheel activity, then we use
-                // the current center of the map.
-                center = Extent.Area.Center;
-            }
-            else
-            {
-                // we use the mouse point to calculate the new center to keep things relative
-            }
+            var proportion = ViewportWidth / ExtentWidth;
 
             // TODO: alter extent to use mouse position for zoom anchor
             Extent.ZoomLevel = Math.Max(0, Extent.ZoomLevel - 1);
 
-            SetHorizontalOffset(HorizontalOffset);
-            SetVerticalOffset(VerticalOffset);
+            SetHorizontalOffset(HorizontalOffset / proportion);
+            SetVerticalOffset(VerticalOffset / proportion);
         }
 
         public override void MouseWheelLeft()
@@ -337,12 +328,13 @@ namespace DHaven.DisCarta
 
         public override void MouseWheelUp()
         {
-            var mousePosition = Mouse.GetPosition(this);
+            var proportion = ViewportWidth / ExtentWidth;
+
             // TODO: alter extent to use mouse position for zoom anchor
             Extent.ZoomLevel = Math.Min(MaxZoomLevel, Extent.ZoomLevel + 1);
 
-            SetHorizontalOffset(HorizontalOffset);
-            SetVerticalOffset(VerticalOffset);
+            SetHorizontalOffset(HorizontalOffset / proportion);
+            SetVerticalOffset(VerticalOffset / proportion);
         }
 
         #endregion

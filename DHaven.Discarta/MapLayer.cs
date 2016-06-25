@@ -101,7 +101,7 @@ namespace DHaven.DisCarta
 
         private bool PlaceIfArea(UIElement element)
         {
-            var elementExtent = Geo.GetArea(element);
+            var elementExtent = GeoArea.Intersection(Geo.GetArea(element), Projection.World);
             var isArea = !elementExtent.IsEmpty;
 
             if (isArea)
