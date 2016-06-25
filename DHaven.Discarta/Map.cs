@@ -88,48 +88,9 @@ namespace DHaven.DisCarta
             dependencyObject.SetValue(ExtentProperty, value);
         }
 
-        protected override Size MeasureOverride(Size availableSize)
-        {
-            if (loading || Projection == null || Extent == null)
-            {
-                return availableSize;
-            }
-
-            var extent = Projection.FullMapSizeFor(Extent.ZoomLevel);
-            var extentOrViewChanged = false;
-            if (!extent.IsEmpty && extent != PanelExtent.Size)
-            {
-                PanelExtent = new Rect(extent);
-                extentOrViewChanged = true;
-            }
-
-            if (availableSize != ViewPort.Size)
-            {
-                ViewPort.Size = availableSize;
-                extentOrViewChanged = true;
-            }
-
-            if (extentOrViewChanged && ScrollOwner != null)
-            {
-                CanHorizontallyScroll = ExtentWidth > ViewportWidth;
-                CanVerticallyScroll = ExtentHeight > ViewportHeight;
-
-                // Enforce the horizontal and vertical placement
-                SetHorizontalOffset(HorizontalOffset);
-                SetVerticalOffset(VerticalOffset);
-            }
-
-            foreach (UIElement child in InternalChildren)
-            {
-                child.Measure(PanelExtent.Size);
-            }
-
-            return PanelExtent.Size;
-        }
-
         protected override Size ArrangeOverride(Size finalSize)
         {
-            if (loading || Projection == null || Extent == null)
+            if (loading || Projection == null || Extent == null || Extent.Area.IsEmpty)
             {
                 return finalSize;
             }
@@ -187,6 +148,23 @@ namespace DHaven.DisCarta
             });
         }
 
+        #region Overrides of ScrollablePanel
+
+        ///// <summary>
+        ///// Override this to perform work if the view port chnages size, etc.
+        ///// </summary>
+        //protected override void OnViewPortChanged()
+        //{
+        //    base.OnViewPortChanged();
+
+        //    if (Projection != null && Extent != null)
+        //    {
+        //        Extent.Area = Projection.ToGeoArea(ViewPort, Extent);
+        //    }
+        //}
+
+        #endregion
+
         private void UnbindLayer(MapLayer child)
         {
             if (child == null)
@@ -225,12 +203,15 @@ namespace DHaven.DisCarta
             if (e.PropertyName == string.Empty || e.PropertyName == nameof(Extent.ZoomLevel))
             {
                 PanelExtent = new Rect(Projection.FullMapSizeFor(Extent.ZoomLevel));
+
                 // Measurements only change when the zoom level changes.  Screen size affects the visual port,
                 // and GeoArea affects the geographic area under the map
                 InvalidateMeasure();
-                ScrollOwner?.InvalidateScrollInfo();
             }
 
+            // TODO: handle tile loading here!!!!
+
+            ScrollOwner?.InvalidateScrollInfo();
             InvalidateArrange();
         }
 

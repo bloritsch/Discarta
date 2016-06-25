@@ -38,6 +38,41 @@ namespace DHaven.DisCarta.Internals
         /// </summary>
         protected double LineLength { get; set; } = 96 / 2.54; // 1 cm in DPU
 
+        /// <summary>
+        /// Override this to perform work if the view port chnages size, etc.
+        /// </summary>
+        protected virtual void OnViewPortChanged()
+        {
+            ScrollOwner?.InvalidateScrollInfo();
+            InvalidateArrange();
+        }
+
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            if (availableSize != ViewPort.Size)
+            {
+                ViewPort.Size = new Size(
+                    double.IsInfinity(availableSize.Width) ? ActualWidth : availableSize.Width,
+                    double.IsInfinity(availableSize.Height) ? ActualHeight: availableSize.Height);
+
+                CanHorizontallyScroll = ExtentWidth > ViewportWidth;
+                CanVerticallyScroll = ExtentHeight > ViewportHeight;
+
+                // Enforce the horizontal and vertical placement
+                SetHorizontalOffset(HorizontalOffset);
+                SetVerticalOffset(VerticalOffset);
+                OnViewPortChanged();
+            }
+
+            foreach (UIElement child in InternalChildren)
+            {
+                child.Measure(PanelExtent.Size);
+            }
+
+            return PanelExtent.Size;
+        }
+
+
         #region Implementation of IScrollInfo
 
         /// <summary>Scrolls up within content by one logical unit. </summary>
@@ -123,9 +158,7 @@ namespace DHaven.DisCarta.Internals
             if (!adjustedOffset.IsSameAs(HorizontalOffset, VisualPrecision))
             {
                 ViewPort.X = adjustedOffset;
-
-                ScrollOwner?.InvalidateScrollInfo();
-                InvalidateArrange();
+                OnViewPortChanged();
             }
         }
 
@@ -140,9 +173,7 @@ namespace DHaven.DisCarta.Internals
             if (!adjustedOffset.IsSameAs(VerticalOffset, VisualPrecision))
             {
                 ViewPort.Y = adjustedOffset;
-
-                ScrollOwner?.InvalidateScrollInfo();
-                InvalidateArrange();
+                OnViewPortChanged();
             }
         }
 
@@ -231,7 +262,7 @@ namespace DHaven.DisCarta.Internals
                     return;
                 }
 
-                // Hase to be done on the dispatcher or it is lost
+                // Hase to be done on the dispatcher or it doesn't update right away
                 Action action = () =>
                 {
                     // Ensure we have the scroll bar functionality, but the scrollbars are not visible.

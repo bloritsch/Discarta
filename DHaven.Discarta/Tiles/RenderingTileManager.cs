@@ -30,7 +30,7 @@ namespace DHaven.DisCarta.Tiles
             var drawing = new DrawingGroup();
             Geo.SetArea(drawing, tileArea);
 
-            var linePen = new Pen(Brushes.Black, 1);
+            var linePen = new Pen(Brushes.Red, 1);
             linePen.Freeze();
 
             using (var context = drawing.Open())

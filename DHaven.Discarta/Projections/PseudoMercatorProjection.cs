@@ -53,27 +53,27 @@ namespace DHaven.DisCarta.Projections
 
         public Size TileSize => new Size(256, 256);
 
-        private static double ToX(double longitude, Extent mapView)
+        private static double ToX(double longitude, int zoomLevel)
         {
-            var zoomFactor = K * Math.Pow(2, mapView.ZoomLevel);
+            var zoomFactor = K * Math.Pow(2, zoomLevel);
             return zoomFactor * (ArgumentUtils.ToRadians(longitude) + Math.PI);
         }
 
-        private static double ToY(double latitude, Extent mapView)
+        private static double ToY(double latitude, int zoomLevel)
         {
-            var zoomFactor = K * Math.Pow(2, mapView.ZoomLevel);
+            var zoomFactor = K * Math.Pow(2, zoomLevel);
             return zoomFactor * (Math.PI - Math.Log(Math.Tan(Math.PI / 4 + ArgumentUtils.ToRadians(latitude) / 2)));
         }
 
-        private static double ToLon(double x, Extent mapView)
+        private static double ToLon(double x, int zoomLevel)
         {
-            var zoomFactor = K * Math.Pow(2, mapView.ZoomLevel);
+            var zoomFactor = K * Math.Pow(2, zoomLevel);
             return ArgumentUtils.ToDegrees(x / zoomFactor - Math.PI);
         }
 
-        private static double ToLat(double y, Extent mapView)
+        private static double ToLat(double y, int zoomLevel)
         {
-            var zoomFactor = K * Math.Pow(2, mapView.ZoomLevel);
+            var zoomFactor = K * Math.Pow(2, zoomLevel);
             return ArgumentUtils.ToDegrees(2 * (Math.Atan(Math.Exp(Math.PI - y / zoomFactor)) - Math.PI / 4));
         }
 
@@ -94,8 +94,8 @@ namespace DHaven.DisCarta.Projections
         {
             return new GeoPoint
             {
-                Latitude = ToLat(point.Y, mapView),
-                Longitude = ToLon(point.X, mapView)
+                Latitude = ToLat(point.Y, mapView.ZoomLevel),
+                Longitude = ToLon(point.X, mapView.ZoomLevel)
             };
         }
 
@@ -103,8 +103,8 @@ namespace DHaven.DisCarta.Projections
         {
             return new Point
             {
-                X = ToX(point.Longitude, mapView),
-                Y = ToY(point.Latitude, mapView)
+                X = ToX(point.Longitude, mapView.ZoomLevel),
+                Y = ToY(point.Latitude, mapView.ZoomLevel)
             };
         }
 

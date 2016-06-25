@@ -53,6 +53,11 @@ namespace DHaven.DisCarta
 
         protected override Size MeasureOverride(Size availableSize)
         {
+            if (Projection == null || VisualExtent == null)
+            {
+                return new Size();
+            }
+
             // Virtualizing Panel Responsibility: visual data I need
             // Ensure the IItemContainerGenerator is initialized (not initialized until InternalChildren is accessed
             // Not sure if still the case..... test
