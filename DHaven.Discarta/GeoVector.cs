@@ -46,7 +46,7 @@ namespace DHaven.DisCarta
         /// </summary>
         public double Magnitude
         {
-            get { return Math.Sqrt((DeltaLatitude * DeltaLatitude) + (DeltaLongitude * DeltaLongitude)); }
+            get { return Math.Sqrt(DeltaLatitude * DeltaLatitude + DeltaLongitude * DeltaLongitude); }
         }
 
         /// <summary>

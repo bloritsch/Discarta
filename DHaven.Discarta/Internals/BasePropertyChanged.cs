@@ -24,11 +24,6 @@ namespace DHaven.DisCarta.Internals
     public class BasePropertyChanged : INotifyPropertyChanged
     {
         /// <summary>
-        ///     Invoked when a property changes.
-        /// </summary>
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        /// <summary>
         ///     Sends the "All Properties Changed" event.  In WPF, you can
         ///     send the ProeprtyChangedEventArgs with string.Empty and all
         ///     bound properties will be updated.
@@ -49,5 +44,14 @@ namespace DHaven.DisCarta.Internals
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
         }
+
+        #region Implementations
+
+        /// <summary>
+        ///     Invoked when a property changes.
+        /// </summary>
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        #endregion
     }
 }

@@ -26,8 +26,6 @@ namespace DHaven.DisCarta.Internals
     /// </summary>
     public class NotifyingUIElementCollection : UIElementCollection, INotifyCollectionChanged
     {
-        public event NotifyCollectionChangedEventHandler CollectionChanged;
-
         public NotifyingUIElementCollection(UIElement visualParent, FrameworkElement logicalParent)
             : base(visualParent, logicalParent) {}
 
@@ -81,5 +79,11 @@ namespace DHaven.DisCarta.Internals
         {
             CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(action, affectedElements));
         }
+
+        #region Implementations
+
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
+
+        #endregion
     }
 }

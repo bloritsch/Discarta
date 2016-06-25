@@ -21,29 +21,8 @@ namespace DHaven.DisCarta.Tiles
     using System.Windows;
     using System.Windows.Media;
 
-    class RenderingTileManager : ITileManager
+    internal class RenderingTileManager : ITileManager
     {
-        public IEnumerable<Task<Drawing>> GetTilesForArea(IProjection projection, Extent mapArea)
-        {
-            var fullMapSize = new Rect(projection.FullMapSizeFor(mapArea.ZoomLevel));
-            var mapRect = projection.ToRect(mapArea);
-
-            var listOfTiles = new List<Task<Drawing>>();
-
-            for (double x = 0; x < fullMapSize.Width; x += projection.TileSize.Width)
-                for (double y = 0; y < fullMapSize.Height; y += projection.TileSize.Height)
-                {
-                    var currentTile = new Rect(x, y, projection.TileSize.Width, projection.TileSize.Height);
-
-                    if (currentTile.IntersectsWith(mapRect))
-                    {
-                        listOfTiles.Add(Task.Run(() => RenderTile(projection, currentTile, mapArea)));
-                    }
-                }
-
-            return listOfTiles;
-        }
-
         private Drawing RenderTile(IProjection projection, Rect currentTile, Extent mapArea)
         {
             var tileArea = projection.ToGeoArea(currentTile, mapArea);
@@ -80,5 +59,30 @@ namespace DHaven.DisCarta.Tiles
             drawing.Freeze();
             return drawing;
         }
+
+        #region Implementations
+
+        public IEnumerable<Task<Drawing>> GetTilesForArea(IProjection projection, Extent mapArea)
+        {
+            var fullMapSize = new Rect(projection.FullMapSizeFor(mapArea.ZoomLevel));
+            var mapRect = projection.ToRect(mapArea);
+
+            var listOfTiles = new List<Task<Drawing>>();
+
+            for (double x = 0; x < fullMapSize.Width; x += projection.TileSize.Width)
+                for (double y = 0; y < fullMapSize.Height; y += projection.TileSize.Height)
+                {
+                    var currentTile = new Rect(x, y, projection.TileSize.Width, projection.TileSize.Height);
+
+                    if (currentTile.IntersectsWith(mapRect))
+                    {
+                        listOfTiles.Add(Task.Run(() => RenderTile(projection, currentTile, mapArea)));
+                    }
+                }
+
+            return listOfTiles;
+        }
+
+        #endregion
     }
 }

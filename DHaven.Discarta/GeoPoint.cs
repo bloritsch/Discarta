@@ -32,7 +32,6 @@ namespace DHaven.DisCarta
         /// </summary>
         /// <param name="latitudeIn">latitude part of the coordinate (-90 to 90)</param>
         /// <param name="longitudeIn">longitude part of the coordinate (-180 to 180)</param>
-        /// <param name="altitudeIn">altitude part of the coordinate (0 is the surface of the WGS84 spheroid</param>
         public GeoPoint(double latitudeIn, double longitudeIn)
         {
             Latitude = latitudeIn;
@@ -52,22 +51,13 @@ namespace DHaven.DisCarta
         /// <summary>
         ///     Gets whether the point is Empty.
         /// </summary>
-        public bool IsEmpty
-        {
-            get { return double.IsNaN(Latitude) || double.IsNaN(Longitude); }
-        }
+        public bool IsEmpty => double.IsNaN(Latitude) || double.IsNaN(Longitude);
 
         /// <summary>
         ///     Gets whether the point is a valid geographic point.
         /// </summary>
-        public bool IsValid
-        {
-            get
-            {
-                return Latitude.IsInRange(-90, 90, ArgumentUtils.DegreePrecision)
-                       && Longitude.IsInRange(-180, 180, ArgumentUtils.DegreePrecision);
-            }
-        }
+        public bool IsValid => Latitude.IsInRange(-90, 90, ArgumentUtils.DegreePrecision)
+                               && Longitude.IsInRange(-180, 180, ArgumentUtils.DegreePrecision);
 
         public static bool operator ==(GeoPoint first, GeoPoint second)
         {
@@ -81,8 +71,8 @@ namespace DHaven.DisCarta
 
         public bool Equals(GeoPoint other)
         {
-            return ArgumentUtils.IsSameAs(Latitude, other.Latitude, ArgumentUtils.DegreePrecision)
-                   && ArgumentUtils.IsSameAs(Longitude, other.Longitude, ArgumentUtils.DegreePrecision);
+            return Latitude.IsSameAs(other.Latitude, ArgumentUtils.DegreePrecision)
+                   && Longitude.IsSameAs(other.Longitude, ArgumentUtils.DegreePrecision);
         }
 
         public override bool Equals(object obj)
@@ -104,7 +94,7 @@ namespace DHaven.DisCarta
 
         public override string ToString()
         {
-            return string.Format("[Lat: {0}, Lon: {1}]", Latitude, Longitude);
+            return $"[Lat: {Latitude}, Lon: {Longitude}]";
         }
 
         public static GeoVector operator -(GeoPoint first, GeoPoint second)

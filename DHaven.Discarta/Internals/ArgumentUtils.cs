@@ -18,7 +18,7 @@ namespace DHaven.DisCarta.Internals
 {
     using System;
 
-    static class ArgumentUtils
+    internal static class ArgumentUtils
     {
         public const double DegreePrecision = 0.00001; // should be ~ 1 meter
         public const double Kilometers = 1000;

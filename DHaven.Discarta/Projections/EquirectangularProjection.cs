@@ -27,19 +27,11 @@ namespace DHaven.DisCarta.Projections
     /// </summary>
     public class EquirectangularProjection : IProjection
     {
-        public string Name
-        {
-            get { return "WGS 84 / World Equidistant Cylindrical"; }
-        }
+        public string Name => "WGS 84 / World Equidistant Cylindrical";
 
-        public Size TileSize
-        {
-            get { return new Size(512, 256); }
-        }
+        public Size TileSize => new Size(512, 256);
 
-        public string WKT
-        {
-            get { return @"PROJCS[""WGS 84 / World Equidistant Cylindrical"",
+        public string WKT => @"PROJCS[""WGS 84 / World Equidistant Cylindrical"",
     GEOGCS[""WGS 84"",
         DATUM[""WGS_1984"",
             SPHEROID[""WGS 84"", 6378137, 298.257223563,
@@ -53,13 +45,33 @@ namespace DHaven.DisCarta.Projections
         AXIS[""Latitude"", NORTH],
         AXIS[""Longitude"", EAST]],
     UNIT[""metre"", 1,
-        AUTHORITY[""EPSG"", ""9001""]]]"; }
+        AUTHORITY[""EPSG"", ""9001""]]]";
+
+        public GeoArea World => new GeoArea(90, 180, -90, -180);
+
+        private static double ToX(double longitude, GeoVector extentSize, Size pixelArea)
+        {
+            // Shift the longitude so that is always positive.
+            return (longitude + 180) * (pixelArea.Width / extentSize.DeltaLongitude);
         }
 
-        public GeoArea World
+        private static double ToY(double latitude, GeoVector extentSize, Size pixelArea)
         {
-            get { return new GeoArea(90, 180, -90, -180); }
+            // Flip latitude coordinates and shift so that it is always visible
+            return (90 - latitude) * (pixelArea.Height / extentSize.DeltaLatitude);
         }
+
+        private static double ToLon(double x, GeoVector extentSize, Size pixelArea)
+        {
+            return x * (extentSize.DeltaLongitude / pixelArea.Width) - 180;
+        }
+
+        private static double ToLat(double y, GeoVector extentSize, Size pixelArea)
+        {
+            return y * (extentSize.DeltaLatitude / pixelArea.Height) - 90;
+        }
+
+        #region Implementations
 
         public Size FullMapSizeFor(int zoomLevel)
         {
@@ -105,26 +117,6 @@ namespace DHaven.DisCarta.Projections
             return new Rect(ToPoint(extent.NorthWest, mapView), ToPoint(extent.SouthEast, mapView));
         }
 
-        private double ToX(double longitude, GeoVector extentSize, Size pixelArea)
-        {
-            // Shift the longitude so that is always positive.
-            return (longitude + 180) * (pixelArea.Width / extentSize.DeltaLongitude);
-        }
-
-        private double ToY(double latitude, GeoVector extentSize, Size pixelArea)
-        {
-            // Flip latitude coordinates and shift so that it is always visible
-            return (90 - latitude) * (pixelArea.Height / extentSize.DeltaLatitude);
-        }
-
-        private double ToLon(double x, GeoVector extentSize, Size pixelArea)
-        {
-            return x * (extentSize.DeltaLongitude / pixelArea.Width) - 180;
-        }
-
-        private double ToLat(double y, GeoVector extentSize, Size pixelArea)
-        {
-            return y * (extentSize.DeltaLatitude / pixelArea.Height) - 90;
-        }
+        #endregion
     }
 }

@@ -84,37 +84,16 @@ namespace DHaven.DisCarta
             set { size = value; }
         }
 
-        public bool IsEmpty
-        {
-            get { return NorthWest.IsEmpty || Size.IsEmpty; }
-        }
+        public bool IsEmpty => NorthWest.IsEmpty || Size.IsEmpty;
 
-        public GeoPoint NorthEast
-        {
-            get { return new GeoPoint(NorthWest.Latitude, NorthWest.Longitude + Size.DeltaLongitude); }
-        }
+        public GeoPoint NorthEast => new GeoPoint(NorthWest.Latitude, NorthWest.Longitude + Size.DeltaLongitude);
 
-        public GeoPoint SouthWest
-        {
-            get { return new GeoPoint(NorthWest.Latitude - Size.DeltaLatitude, NorthWest.Longitude); }
-        }
+        public GeoPoint SouthWest => new GeoPoint(NorthWest.Latitude - Size.DeltaLatitude, NorthWest.Longitude);
 
-        public GeoPoint SouthEast
-        {
-            get
-            {
-                return new GeoPoint(NorthWest.Latitude - Size.DeltaLatitude, NorthWest.Longitude + Size.DeltaLongitude);
-            }
-        }
+        public GeoPoint SouthEast => new GeoPoint(NorthWest.Latitude - Size.DeltaLatitude, NorthWest.Longitude + Size.DeltaLongitude);
 
-        public GeoPoint Center
-        {
-            get
-            {
-                return new GeoPoint(NorthWest.Latitude - (Size.DeltaLatitude / 2),
-                    NorthWest.Longitude + (Size.DeltaLongitude / 2));
-            }
-        }
+        public GeoPoint Center => new GeoPoint(NorthWest.Latitude - Size.DeltaLatitude / 2,
+            NorthWest.Longitude + Size.DeltaLongitude / 2);
 
         public static bool operator ==(GeoArea first, GeoArea second)
         {
@@ -159,7 +138,7 @@ namespace DHaven.DisCarta
 
         public override string ToString()
         {
-            return string.Format("{{{0}, {1}}}", NorthWest, SouthEast);
+            return $"{{{NorthWest}, {SouthEast}}}";
         }
     }
 }
