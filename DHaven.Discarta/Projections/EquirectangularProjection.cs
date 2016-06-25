@@ -1,39 +1,45 @@
 ﻿#region Copyright 2016 D-Haven.org
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #endregion
-using System;
-using System.Windows;
 
 namespace DHaven.DisCarta.Projections
 {
+    using System;
+    using System.Windows;
+
     /// <summary>
-    /// Equirectangular projection would map 1-1 if the size of the map
-    /// were the same size as the screen (w: 360, h: 180).  So the lat/lon
-    /// are simply scaled according to the size of the extent.  Our screen
-    /// size and extent size must be proportional.
+    ///     Equirectangular projection would map 1-1 if the size of the map
+    ///     were the same size as the screen (w: 360, h: 180).  So the lat/lon
+    ///     are simply scaled according to the size of the extent.  Our screen
+    ///     size and extent size must be proportional.
     /// </summary>
     public class EquirectangularProjection : IProjection
     {
-        public string Name { get { return "WGS 84 / World Equidistant Cylindrical"; } }
+        public string Name
+        {
+            get { return "WGS 84 / World Equidistant Cylindrical"; }
+        }
 
-        public Size TileSize { get { return new Size(512, 512); } }
+        public Size TileSize
+        {
+            get { return new Size(512, 256); }
+        }
 
         public string WKT
         {
-            get
-            {
-                return @"PROJCS[""WGS 84 / World Equidistant Cylindrical"",
+            get { return @"PROJCS[""WGS 84 / World Equidistant Cylindrical"",
     GEOGCS[""WGS 84"",
         DATUM[""WGS_1984"",
             SPHEROID[""WGS 84"", 6378137, 298.257223563,
@@ -47,16 +53,18 @@ namespace DHaven.DisCarta.Projections
         AXIS[""Latitude"", NORTH],
         AXIS[""Longitude"", EAST]],
     UNIT[""metre"", 1,
-        AUTHORITY[""EPSG"", ""9001""]]]";
-            }
+        AUTHORITY[""EPSG"", ""9001""]]]"; }
         }
 
-        public GeoArea World { get { return new GeoArea(90, 180, -90, -180); } }
+        public GeoArea World
+        {
+            get { return new GeoArea(90, 180, -90, -180); }
+        }
 
         public Size FullMapSizeFor(int zoomLevel)
         {
-            double width = 2 * TileSize.Width * Math.Pow(2, zoomLevel);
-            double height = TileSize.Height * Math.Pow(2, zoomLevel);
+            var width = TileSize.Width * Math.Pow(2, zoomLevel);
+            var height = TileSize.Height * Math.Pow(2, zoomLevel);
             return new Size(width, height);
         }
 
@@ -67,7 +75,7 @@ namespace DHaven.DisCarta.Projections
 
         public GeoPoint ToGeoPoint(Point point, Extent mapView)
         {
-            Size mapSize = FullMapSizeFor(mapView.ZoomLevel);
+            var mapSize = FullMapSizeFor(mapView.ZoomLevel);
 
             return new GeoPoint
             {
@@ -78,7 +86,7 @@ namespace DHaven.DisCarta.Projections
 
         public Point ToPoint(GeoPoint point, Extent mapView)
         {
-            Size mapSize = FullMapSizeFor(mapView.ZoomLevel);
+            var mapSize = FullMapSizeFor(mapView.ZoomLevel);
 
             return new Point
             {

@@ -1,21 +1,23 @@
 ﻿#region Copyright 2016 D-Haven.org
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #endregion
-using System;
 
 namespace DHaven.DisCarta.Internals
 {
+    using System;
+
     static class ArgumentUtils
     {
         public const double DegreePrecision = 0.00001; // should be ~ 1 meter
@@ -23,7 +25,7 @@ namespace DHaven.DisCarta.Internals
         public const double MeanEarthRadius = 6371 * Kilometers;
 
         /// <summary>
-        /// Determines if one double is the same as another one within the specified precision.
+        ///     Determines if one double is the same as another one within the specified precision.
         /// </summary>
         /// <param name="first">the first double to compare</param>
         /// <param name="second">the second double to compare</param>
@@ -45,7 +47,7 @@ namespace DHaven.DisCarta.Internals
         }
 
         /// <summary>
-        /// Throw a ArgumentNullException if the value is null.
+        ///     Throw a ArgumentNullException if the value is null.
         /// </summary>
         /// <param name="value"></param>
         /// <param name="parameterName"></param>
@@ -58,7 +60,7 @@ namespace DHaven.DisCarta.Internals
         }
 
         /// <summary>
-        /// Determine if the second value is greater than or the same as the first, within the specified precision.
+        ///     Determine if the second value is greater than or the same as the first, within the specified precision.
         /// </summary>
         /// <param name="first">value to compare</param>
         /// <param name="second">value to compare against</param>
@@ -70,7 +72,7 @@ namespace DHaven.DisCarta.Internals
         }
 
         /// <summary>
-        /// Determine if the second value is less than or the same as the first, within the specified precision.
+        ///     Determine if the second value is less than or the same as the first, within the specified precision.
         /// </summary>
         /// <param name="first">value to compare</param>
         /// <param name="second">value to compare against</param>
@@ -82,7 +84,7 @@ namespace DHaven.DisCarta.Internals
         }
 
         /// <summary>
-        /// Determine if a value is within a specified range (inclusive, including precision).
+        ///     Determine if a value is within a specified range (inclusive, including precision).
         /// </summary>
         /// <param name="value">the value to compare</param>
         /// <param name="minValue">the minimum allowed value</param>

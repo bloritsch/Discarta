@@ -1,22 +1,24 @@
 ﻿#region Copyright 2016 D-Haven.org
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #endregion
-using DHaven.DisCarta.Internals;
-using System;
 
 namespace DHaven.DisCarta
 {
+    using System;
+    using Internals;
+
     public struct GeoArea : IEquatable<GeoArea>
     {
         public static readonly GeoArea Empty = new GeoArea(GeoPoint.Empty, GeoVector.Empty);
@@ -65,7 +67,7 @@ namespace DHaven.DisCarta
         }
 
         /// <summary>
-        /// Gets or sets the anchor position (top left, or north west).
+        ///     Gets or sets the anchor position (top left, or north west).
         /// </summary>
         public GeoPoint NorthWest
         {
@@ -74,7 +76,7 @@ namespace DHaven.DisCarta
         }
 
         /// <summary>
-        /// Gets or sets the dimensions of this geo area.
+        ///     Gets or sets the dimensions of this geo area.
         /// </summary>
         public GeoVector Size
         {
@@ -82,7 +84,10 @@ namespace DHaven.DisCarta
             set { size = value; }
         }
 
-        public bool IsEmpty { get { return NorthWest.IsEmpty || Size.IsEmpty; } }
+        public bool IsEmpty
+        {
+            get { return NorthWest.IsEmpty || Size.IsEmpty; }
+        }
 
         public GeoPoint NorthEast
         {
@@ -96,12 +101,19 @@ namespace DHaven.DisCarta
 
         public GeoPoint SouthEast
         {
-            get { return new GeoPoint(NorthWest.Latitude - Size.DeltaLatitude, NorthWest.Longitude + Size.DeltaLongitude); }
+            get
+            {
+                return new GeoPoint(NorthWest.Latitude - Size.DeltaLatitude, NorthWest.Longitude + Size.DeltaLongitude);
+            }
         }
 
         public GeoPoint Center
         {
-            get { return new GeoPoint(NorthWest.Latitude - (Size.DeltaLatitude / 2), NorthWest.Longitude + (Size.DeltaLongitude / 2)); }
+            get
+            {
+                return new GeoPoint(NorthWest.Latitude - (Size.DeltaLatitude / 2),
+                    NorthWest.Longitude + (Size.DeltaLongitude / 2));
+            }
         }
 
         public static bool operator ==(GeoArea first, GeoArea second)
@@ -121,14 +133,14 @@ namespace DHaven.DisCarta
 
         public override bool Equals(object obj)
         {
-            return obj is GeoArea && Equals((GeoArea)obj);
+            return obj is GeoArea && Equals((GeoArea) obj);
         }
 
         public override int GetHashCode()
         {
             unchecked
             {
-                int hash = 17;
+                var hash = 17;
                 hash = hash * 23 + NorthWest.GetHashCode();
                 hash = hash * 23 + Size.GetHashCode();
 

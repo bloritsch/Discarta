@@ -11,47 +11,49 @@
     <Window.Resources>
         <DisCarta:GeoArea x:Key="World">
             <DisCarta:GeoArea.NorthWest>
-                <DisCarta:GeoPoint Latitude="85.051129" Longitude="-180"/>
+                <DisCarta:GeoPoint Latitude="85.051129" Longitude="-180" />
             </DisCarta:GeoArea.NorthWest>
             <DisCarta:GeoArea.Size>
-                <DisCarta:GeoVector DeltaLatitude="170.102258" DeltaLongitude="360"/>
+                <DisCarta:GeoVector DeltaLatitude="170.102258" DeltaLongitude="360" />
             </DisCarta:GeoArea.Size>
         </DisCarta:GeoArea>
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition />
+            <ColumnDefinition Width="2*" />
         </Grid.ColumnDefinitions>
-        <TextBlock Grid.Column="0" Panel.ZIndex="100" VerticalAlignment="Bottom" HorizontalAlignment="Center" FontFamily="Segue UI" FontSize="24" Foreground="LimeGreen" Text="Psuedo Mercator (online maps)">
+        <TextBlock Grid.Column="0" Panel.ZIndex="100" VerticalAlignment="Bottom" HorizontalAlignment="Center"
+                   FontFamily="Segue UI" FontSize="24" Foreground="LimeGreen" Text="Psuedo Mercator (online maps)">
             <TextBlock.Effect>
-                <DropShadowEffect ShadowDepth="2"/>
+                <DropShadowEffect ShadowDepth="2" />
             </TextBlock.Effect>
         </TextBlock>
-        <ScrollViewer Grid.Column="0" CanContentScroll="True" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden">
-        <DisCarta:Map>
-            <DisCarta:Map.Projection>
-                <Projections:PseudoMercatorProjection/>
-            </DisCarta:Map.Projection>
-            <DisCarta:MapLayer Background="LightSteelBlue">
-                <Image Source="World.png" Stretch="Fill" DisCarta:Geo.Area="{StaticResource World}"/>
-            </DisCarta:MapLayer>
-        </DisCarta:Map>
+        <ScrollViewer Grid.Column="0" CanContentScroll="True">
+            <DisCarta:Map>
+                <DisCarta:Map.Projection>
+                    <Projections:PseudoMercatorProjection />
+                </DisCarta:Map.Projection>
+                <DisCarta:MapLayer Background="LightSteelBlue">
+                    <!--<Image Source="World.png" Stretch="Fill" DisCarta:Geo.Area="{StaticResource World}"/>-->
+                </DisCarta:MapLayer>
+            </DisCarta:Map>
         </ScrollViewer>
-        <TextBlock Grid.Column="1" Panel.ZIndex="100" VerticalAlignment="Bottom" HorizontalAlignment="Center" FontFamily="Segue UI" FontSize="24" Foreground="LimeGreen" Text="Equirectangular">
+        <TextBlock Grid.Column="1" Panel.ZIndex="100" VerticalAlignment="Bottom" HorizontalAlignment="Center"
+                   FontFamily="Segue UI" FontSize="24" Foreground="LimeGreen" Text="Equirectangular">
             <TextBlock.Effect>
-                <DropShadowEffect ShadowDepth="2"/>
+                <DropShadowEffect ShadowDepth="2" />
             </TextBlock.Effect>
         </TextBlock>
-        <ScrollViewer Grid.Column="1" CanContentScroll="True" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden">
-        <DisCarta:Map>
-            <DisCarta:Map.Projection>
-                <Projections:EquirectangularProjection/>
-            </DisCarta:Map.Projection>
-            <DisCarta:MapLayer Background="LightSteelBlue">
-                <Image Source="World.png" Stretch="Fill" DisCarta:Geo.Area="{StaticResource World}"/>
-            </DisCarta:MapLayer>
-        </DisCarta:Map>
+        <ScrollViewer Grid.Column="1" CanContentScroll="True">
+            <DisCarta:Map>
+                <DisCarta:Map.Projection>
+                    <Projections:EquirectangularProjection />
+                </DisCarta:Map.Projection>
+                <DisCarta:MapLayer Background="LightSteelBlue">
+                    <!--<Image Source="World.png" Stretch="Fill" DisCarta:Geo.Area="{StaticResource World}"/>-->
+                </DisCarta:MapLayer>
+            </DisCarta:Map>
         </ScrollViewer>
     </Grid>
 </Window>

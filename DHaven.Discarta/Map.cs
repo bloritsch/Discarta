@@ -1,112 +1,64 @@
 ﻿#region Copyright 2016 D-Haven.org
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-#endregion
 
-using DHaven.DisCarta.Internals;
-using DHaven.DisCarta.Projections;
-using System.Collections.Specialized;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.ComponentModel;
-using System.Windows.Controls.Primitives;
-using System;
-using System.Windows.Media;
-using System.Windows.Input;
-using System.Linq;
-using DHaven.DisCarta.Tiles;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Windows.Shapes;
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#endregion
 
 namespace DHaven.DisCarta
 {
+    using System;
+    using System.Collections.Specialized;
+    using System.ComponentModel;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using System.Windows;
+    using System.Windows.Controls;
+    using System.Windows.Controls.Primitives;
+    using System.Windows.Data;
+    using System.Windows.Input;
+    using System.Windows.Media;
+    using System.Windows.Shapes;
+    using Internals;
+    using Projections;
+    using Tiles;
+
     public class Map : Panel, IScrollInfo
     {
         public const int MaxZoomLevel = 19; // total of 20 zoom levels from 0-19.
         private const double LineSize = 96 / 2.54; // 1 cm in DPU
-        public static readonly DependencyProperty ProjectionProperty = DependencyProperty.RegisterAttached("Projection", typeof(IProjection), typeof(Map), new FrameworkPropertyMetadata(new EquirectangularProjection(), FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
-        public static readonly DependencyProperty ExtentProperty = DependencyProperty.RegisterAttached("ExtentProperty", typeof(Extent), typeof(Map), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, VisualExtentChanged));
 
+        public static readonly DependencyProperty ProjectionProperty = DependencyProperty.RegisterAttached(
+            "Projection", typeof(IProjection), typeof(Map),
+            new FrameworkPropertyMetadata(new EquirectangularProjection(),
+                FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
+
+        public static readonly DependencyProperty ExtentProperty = DependencyProperty.RegisterAttached(
+            "ExtentProperty", typeof(Extent), typeof(Map),
+            new FrameworkPropertyMetadata(null,
+                FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange,
+                VisualExtentChanged));
+
+        private ScrollViewer owner;
         private Rect mapRect;
         private Rect viewPort;
         private bool loading = true;
-        private ITileManager tileManager;
+        private readonly ITileManager tileManager;
 
         public Map()
         {
             tileManager = new RenderingTileManager();
             Loaded += MapLoaded;
             ClipToBounds = true;
-        }
-
-        private async void MapLoaded(object sender, RoutedEventArgs e)
-        {
-            Loaded -= MapLoaded;
-            loading = false;
-
-            // Size the map so it is big enough to cover the visible area
-
-            int desiredZoomLevel = -1;
-            Size mapSize = Size.Empty;
-
-            while(mapSize.Width < ActualWidth || mapSize.Height < ActualHeight)
-            {
-                desiredZoomLevel++;
-                mapSize = Projection.FullMapSizeFor(desiredZoomLevel);
-            }
-
-            Extent = new Extent
-            {
-                Area = Projection.World,
-                ZoomLevel = desiredZoomLevel
-            };
-
-            // for now let's always center it (view port support is comming)
-            SetHorizontalOffset((ViewportWidth - ExtentWidth) / 2);
-            SetVerticalOffset((ViewportHeight- ExtentHeight) / 2);
-
-            if (ScrollOwner != null)
-            {
-                ScrollOwner.InvalidateScrollInfo();
-            }
-
-            List<Task<Drawing>> tiles = tileManager.GetTilesForArea(Projection, Extent).ToList();
-            while (tiles.Any())
-            {
-                await Task.WhenAny(tiles);
-                
-                foreach(Task<Drawing> finishedDrawing in tiles.Where(t=>t.IsCompleted).ToList())
-                {
-                    Drawing tileContent = await finishedDrawing;
-                    Rectangle visual = new Rectangle();
-                    Geo.SetArea(visual, Geo.GetArea(tileContent));
-
-                    DrawingBrush brush = new DrawingBrush
-                    {
-                        Drawing = tileContent,
-                        Stretch = Stretch.Fill
-                    };
-
-                    brush.Freeze();
-                    visual.Fill = brush;
-                    SetZIndex(visual, int.MinValue);
-
-                    Children.Add(visual);
-                    tiles.Remove(finishedDrawing);
-                }
-            }
         }
 
         public IProjection Projection
@@ -155,7 +107,20 @@ namespace DHaven.DisCarta
             get { return -viewPort.Y; }
         }
 
-        public ScrollViewer ScrollOwner { get; set; }
+        public ScrollViewer ScrollOwner
+        {
+            get { return owner; }
+            set
+            {
+                if (!ReferenceEquals(owner, value))
+                {
+                    owner = value;
+
+                    owner.HorizontalScrollBarVisibility = ScrollBarVisibility.Hidden;
+                    owner.VerticalScrollBarVisibility = ScrollBarVisibility.Hidden;
+                }
+            }
+        }
 
         public static IProjection GetProjection(DependencyObject dependencyObject)
         {
@@ -184,8 +149,8 @@ namespace DHaven.DisCarta
                 return availableSize;
             }
 
-            Size extent = Projection.FullMapSizeFor(Extent.ZoomLevel);
-            bool extentOrViewChanged = false;
+            var extent = Projection.FullMapSizeFor(Extent.ZoomLevel);
+            var extentOrViewChanged = false;
             if (extent != mapRect.Size)
             {
                 mapRect = new Rect(extent);
@@ -208,11 +173,11 @@ namespace DHaven.DisCarta
 
             foreach (UIElement child in InternalChildren)
             {
-                Size desiredSize = child is MapLayer ? mapRect.Size : new Size();
+                var desiredSize = child is MapLayer ? mapRect.Size : new Size();
                 child.Measure(mapRect.Size);
             }
 
-            return availableSize;
+            return mapRect.Size;
         }
 
         protected override Size ArrangeOverride(Size finalSize)
@@ -232,19 +197,19 @@ namespace DHaven.DisCarta
                 }
             }
 
-            Rect viewRect = Projection.ToRect(Extent.Area, Extent);
+            var viewRect = Projection.ToRect(Extent.Area, Extent);
             viewRect.X = viewPort.X;
             viewRect.Y = viewPort.Y;
 
             foreach (UIElement child  in InternalChildren)
             {
-                Rect placement = viewRect;
+                var placement = viewRect;
 
-                if(! (child is MapLayer))
+                if (!(child is MapLayer))
                 {
                     placement = Projection.ToRect(Geo.GetArea(child), Extent);
-                    placement.X += viewPort.X;
-                    placement.Y += viewPort.Y;
+                    //placement.X += viewPort.X;
+                    //placement.Y += viewPort.Y;
                 }
 
                 child.Arrange(placement);
@@ -255,7 +220,7 @@ namespace DHaven.DisCarta
 
         protected override UIElementCollection CreateUIElementCollection(FrameworkElement logicalParent)
         {
-            NotifyingUIElementCollection collection = new NotifyingUIElementCollection(this, logicalParent);
+            var collection = new NotifyingUIElementCollection(this, logicalParent);
             collection.CollectionChanged += ChildrenCollectionChanged;
 
             return collection;
@@ -296,20 +261,20 @@ namespace DHaven.DisCarta
 
         private static void VisualExtentChanged(DependencyObject d, DependencyPropertyChangedEventArgs args)
         {
-            Map map = d as Map;
+            var map = d as Map;
 
-            if(map == null)
+            if (map == null)
             {
                 return;
             }
 
-            Extent oldExtent = args.OldValue as Extent;
+            var oldExtent = args.OldValue as Extent;
             if (oldExtent != null)
             {
                 oldExtent.PropertyChanged -= map.VisualExtentValuesChanged;
             }
 
-            Extent newExtent = args.NewValue as Extent;
+            var newExtent = args.NewValue as Extent;
             if (newExtent != null)
             {
                 newExtent.PropertyChanged += map.VisualExtentValuesChanged;
@@ -320,6 +285,7 @@ namespace DHaven.DisCarta
         {
             if (e.PropertyName == string.Empty || e.PropertyName == nameof(Extent.ZoomLevel))
             {
+                mapRect = new Rect(Projection.FullMapSizeFor(Extent.ZoomLevel));
                 // Measurements only change when the zoom level changes.  Screen size affects the visual port,
                 // and GeoArea affects the geographic area under the map
                 InvalidateMeasure();
@@ -330,17 +296,17 @@ namespace DHaven.DisCarta
 
         private void ChildrenCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            if(e.OldItems != null)
+            if (e.OldItems != null)
             {
-                foreach(UIElement child in e.OldItems)
+                foreach (UIElement child in e.OldItems)
                 {
                     UnbindLayer(child as MapLayer);
                 }
             }
 
-            if(e.NewItems != null)
+            if (e.NewItems != null)
             {
-                foreach(UIElement child in e.NewItems)
+                foreach (UIElement child in e.NewItems)
                 {
                     BindLayer(child as MapLayer);
                 }
@@ -389,16 +355,22 @@ namespace DHaven.DisCarta
 
         public void MouseWheelUp()
         {
-            Point mousePosition = Mouse.GetPosition(this);
+            var mousePosition = Mouse.GetPosition(this);
             // TODO: alter extent to use mouse position for zoom anchor
             Extent.ZoomLevel = Math.Min(MaxZoomLevel, Extent.ZoomLevel + 1);
+
+            SetHorizontalOffset(HorizontalOffset);
+            SetVerticalOffset(VerticalOffset);
         }
 
         public void MouseWheelDown()
         {
-            Point mousePosition = Mouse.GetPosition(this);
+            var mousePosition = Mouse.GetPosition(this);
             // TODO: alter extent to use mouse position for zoom anchor
             Extent.ZoomLevel = Math.Max(0, Extent.ZoomLevel - 1);
+
+            SetHorizontalOffset(HorizontalOffset);
+            SetVerticalOffset(VerticalOffset);
         }
 
         public void MouseWheelLeft()
@@ -439,6 +411,65 @@ namespace DHaven.DisCarta
             rectangle.Intersect(mapRect);
 
             return rectangle;
+        }
+
+
+        private async void MapLoaded(object sender, RoutedEventArgs e)
+        {
+            Loaded -= MapLoaded;
+            loading = false;
+
+            // Size the map so it is big enough to cover the visible area
+
+            var desiredZoomLevel = -1;
+            var mapSize = Size.Empty;
+
+            while (mapSize.Width < ActualWidth || mapSize.Height < ActualHeight)
+            {
+                desiredZoomLevel++;
+                mapSize = Projection.FullMapSizeFor(desiredZoomLevel);
+            }
+
+            Extent = new Extent
+            {
+                Area = Projection.World,
+                ZoomLevel = desiredZoomLevel
+            };
+
+            // for now let's always center it (view port support is comming)
+            SetHorizontalOffset((ViewportWidth - ExtentWidth) / 2);
+            SetVerticalOffset((ViewportHeight - ExtentHeight) / 2);
+
+            if (ScrollOwner != null)
+            {
+                ScrollOwner.InvalidateScrollInfo();
+            }
+
+            var tiles = tileManager.GetTilesForArea(Projection, Extent).ToList();
+            while (tiles.Any())
+            {
+                await Task.WhenAny(tiles);
+
+                foreach (var finishedDrawing in tiles.Where(t => t.IsCompleted).ToList())
+                {
+                    var tileContent = await finishedDrawing;
+                    var visual = new Rectangle();
+                    Geo.SetArea(visual, Geo.GetArea(tileContent));
+
+                    var brush = new DrawingBrush
+                    {
+                        Drawing = tileContent,
+                        Stretch = Stretch.Fill
+                    };
+
+                    brush.Freeze();
+                    visual.Fill = brush;
+                    SetZIndex(visual, int.MinValue);
+
+                    Children.Add(visual);
+                    tiles.Remove(finishedDrawing);
+                }
+            }
         }
     }
 }
