@@ -51,6 +51,7 @@
     <Compile Include="Internals\BasePropertyChanged.cs" />
     <Compile Include="Internals\ArgumentUtils.cs" />
     <Compile Include="Internals\NotifyingUIElementCollection.cs" />
+    <Compile Include="Internals\ScrollablePanel.cs" />
     <Compile Include="IProjection.cs" />
     <Compile Include="Map.cs" />
     <Compile Include="MapLayer.cs" />

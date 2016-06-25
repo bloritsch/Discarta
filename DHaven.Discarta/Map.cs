@@ -23,7 +23,6 @@ namespace DHaven.DisCarta
     using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Controls;
-    using System.Windows.Controls.Primitives;
     using System.Windows.Data;
     using System.Windows.Input;
     using System.Windows.Media;
@@ -32,10 +31,9 @@ namespace DHaven.DisCarta
     using Projections;
     using Tiles;
 
-    public class Map : Panel, IScrollInfo
+    public class Map : ScrollablePanel
     {
         public const int MaxZoomLevel = 19; // total of 20 zoom levels from 0-19.
-        private const double LineSize = 96 / 2.54; // 1 cm in DPU
 
         public static readonly DependencyProperty ProjectionProperty = DependencyProperty.RegisterAttached(
             "Projection", typeof(IProjection), typeof(Map),
@@ -50,10 +48,6 @@ namespace DHaven.DisCarta
 
         private readonly ITileManager tileManager;
         private bool loading = true;
-        private Rect mapRect;
-
-        private ScrollViewer owner;
-        private Rect viewPort;
 
         public Map()
         {
@@ -72,37 +66,6 @@ namespace DHaven.DisCarta
         {
             get { return GetExtent(this); }
             set { SetExtent(this, value); }
-        }
-
-        public bool CanVerticallyScroll { get; set; }
-
-        public bool CanHorizontallyScroll { get; set; }
-
-        public double ExtentWidth => mapRect.Width;
-
-        public double ExtentHeight => mapRect.Height;
-
-        public double ViewportWidth => viewPort.Width;
-
-        public double ViewportHeight => viewPort.Height;
-
-        public double HorizontalOffset => -viewPort.X;
-
-        public double VerticalOffset => -viewPort.Y;
-
-        public ScrollViewer ScrollOwner
-        {
-            get { return owner; }
-            set
-            {
-                if (!ReferenceEquals(owner, value))
-                {
-                    owner = value;
-
-                    owner.HorizontalScrollBarVisibility = ScrollBarVisibility.Hidden;
-                    owner.VerticalScrollBarVisibility = ScrollBarVisibility.Hidden;
-                }
-            }
         }
 
         public static IProjection GetProjection(DependencyObject dependencyObject)
@@ -134,15 +97,15 @@ namespace DHaven.DisCarta
 
             var extent = Projection.FullMapSizeFor(Extent.ZoomLevel);
             var extentOrViewChanged = false;
-            if (extent != mapRect.Size)
+            if (!extent.IsEmpty && extent != PanelExtent.Size)
             {
-                mapRect = new Rect(extent);
+                PanelExtent = new Rect(extent);
                 extentOrViewChanged = true;
             }
 
-            if (availableSize != viewPort.Size)
+            if (availableSize != ViewPort.Size)
             {
-                viewPort.Size = availableSize;
+                ViewPort.Size = availableSize;
                 extentOrViewChanged = true;
             }
 
@@ -151,15 +114,17 @@ namespace DHaven.DisCarta
                 CanHorizontallyScroll = ExtentWidth > ViewportWidth;
                 CanVerticallyScroll = ExtentHeight > ViewportHeight;
 
-                ScrollOwner.InvalidateScrollInfo();
+                // Enforce the horizontal and vertical placement
+                SetHorizontalOffset(HorizontalOffset);
+                SetVerticalOffset(VerticalOffset);
             }
 
             foreach (UIElement child in InternalChildren)
             {
-                child.Measure(mapRect.Size);
+                child.Measure(PanelExtent.Size);
             }
 
-            return mapRect.Size;
+            return PanelExtent.Size;
         }
 
         protected override Size ArrangeOverride(Size finalSize)
@@ -169,16 +134,11 @@ namespace DHaven.DisCarta
                 return finalSize;
             }
 
-            if (finalSize != viewPort.Size)
-            {
-                viewPort.Size = finalSize;
-
-                ScrollOwner?.InvalidateScrollInfo();
-            }
+            Vector offset = PanelExtent.TopLeft - ViewPort.TopLeft;
 
             var viewRect = Projection.ToRect(Extent.Area, Extent);
-            viewRect.X = viewPort.X;
-            viewRect.Y = viewPort.Y;
+            viewRect.X += offset.X;
+            viewRect.Y += offset.Y;
 
             foreach (UIElement child  in InternalChildren)
             {
@@ -187,14 +147,14 @@ namespace DHaven.DisCarta
                 if (!(child is MapLayer))
                 {
                     placement = Projection.ToRect(Geo.GetArea(child), Extent);
-                    placement.X += viewPort.X;
-                    placement.Y += viewPort.Y;
+                    placement.X += offset.X;
+                    placement.Y += offset.Y;
                 }
 
                 child.Arrange(placement);
             }
 
-            return viewPort.Size;
+            return ViewPort.Size;
         }
 
         protected override UIElementCollection CreateUIElementCollection(FrameworkElement logicalParent)
@@ -264,10 +224,11 @@ namespace DHaven.DisCarta
         {
             if (e.PropertyName == string.Empty || e.PropertyName == nameof(Extent.ZoomLevel))
             {
-                mapRect = new Rect(Projection.FullMapSizeFor(Extent.ZoomLevel));
+                PanelExtent = new Rect(Projection.FullMapSizeFor(Extent.ZoomLevel));
                 // Measurements only change when the zoom level changes.  Screen size affects the visual port,
                 // and GeoArea affects the geographic area under the map
                 InvalidateMeasure();
+                ScrollOwner?.InvalidateScrollInfo();
             }
 
             InvalidateArrange();
@@ -299,13 +260,13 @@ namespace DHaven.DisCarta
 
             // Size the map so it is big enough to cover the visible area
 
+            ViewPort.Size = new Size(ActualWidth, ActualHeight);
             var desiredZoomLevel = -1;
-            var mapSize = Size.Empty;
 
-            while (mapSize.Width < ActualWidth || mapSize.Height < ActualHeight)
+            while (ExtentWidth < ViewportWidth || ExtentHeight < ViewportHeight)
             {
                 desiredZoomLevel++;
-                mapSize = Projection.FullMapSizeFor(desiredZoomLevel);
+                PanelExtent.Size = Projection.FullMapSizeFor(desiredZoomLevel);
             }
 
             Extent = new Extent
@@ -315,8 +276,8 @@ namespace DHaven.DisCarta
             };
 
             // for now let's always center it (view port support is comming)
-            SetHorizontalOffset((ViewportWidth - ExtentWidth) / 2);
-            SetVerticalOffset((ViewportHeight - ExtentHeight) / 2);
+            SetHorizontalOffset((ExtentWidth - ViewportWidth) / 2);
+            SetVerticalOffset((ExtentHeight - ViewportHeight) / 2);
 
             ScrollOwner?.InvalidateScrollInfo();
 
@@ -339,7 +300,7 @@ namespace DHaven.DisCarta
 
                     brush.Freeze();
                     visual.Fill = brush;
-                    SetZIndex(visual, int.MinValue);
+                    SetZIndex(visual, int.MaxValue);
 
                     Children.Add(visual);
                     tiles.Remove(finishedDrawing);
@@ -349,43 +310,23 @@ namespace DHaven.DisCarta
 
         #region Implementations
 
-        public void LineDown()
-        {
-            SetVerticalOffset(VerticalOffset + LineSize);
-        }
-
-        public void LineLeft()
-        {
-            SetHorizontalOffset(HorizontalOffset - LineSize);
-        }
-
-        public void LineRight()
-        {
-            SetHorizontalOffset(HorizontalOffset + LineSize);
-        }
-
-        public void LineUp()
-        {
-            SetVerticalOffset(VerticalOffset - LineSize);
-        }
-
-        public Rect MakeVisible(Visual visual, Rect rectangle)
+        public override Rect MakeVisible(Visual visual, Rect rectangle)
         {
             // We'll just assume the source Rect is correct for now.
             // When we actually get to placing things on screen
             // we'll fix this.
-            rectangle.Intersect(mapRect);
+            rectangle.Intersect(PanelExtent);
 
             return rectangle;
         }
 
-        public void MouseWheelDown()
+        public override void MouseWheelDown()
         {
             var mousePosition = Mouse.GetPosition(this);
             GeoPoint center;
 
-            if (mousePosition.X < 0 || mousePosition.Y < 0 || mousePosition.X > viewPort.Width
-                || mousePosition.Y > viewPort.Height)
+            if (mousePosition.X < 0 || mousePosition.Y < 0 || mousePosition.X > ViewportWidth
+                || mousePosition.Y > ViewportHeight)
             {
                 // if the mouse is outside of the during mouse wheel activity, then we use
                 // the current center of the map.
@@ -398,27 +339,22 @@ namespace DHaven.DisCarta
 
             // TODO: alter extent to use mouse position for zoom anchor
             Extent.ZoomLevel = Math.Max(0, Extent.ZoomLevel - 1);
-            Rect invertedViewPort = viewPort;
-            invertedViewPort.X = -viewPort.X;
-            invertedViewPort.Y = -viewPort.Y;
-
-            Extent.Area = Projection.ToGeoArea(invertedViewPort, Extent);
 
             SetHorizontalOffset(HorizontalOffset);
             SetVerticalOffset(VerticalOffset);
         }
 
-        public void MouseWheelLeft()
+        public override void MouseWheelLeft()
         {
             MouseWheelDown();
         }
 
-        public void MouseWheelRight()
+        public override void MouseWheelRight()
         {
             MouseWheelUp();
         }
 
-        public void MouseWheelUp()
+        public override void MouseWheelUp()
         {
             var mousePosition = Mouse.GetPosition(this);
             // TODO: alter extent to use mouse position for zoom anchor
@@ -426,52 +362,6 @@ namespace DHaven.DisCarta
 
             SetHorizontalOffset(HorizontalOffset);
             SetVerticalOffset(VerticalOffset);
-        }
-
-        public void PageDown()
-        {
-            SetVerticalOffset(VerticalOffset + ViewportHeight);
-        }
-
-        public void PageLeft()
-        {
-            SetHorizontalOffset(HorizontalOffset - ViewportWidth);
-        }
-
-        public void PageRight()
-        {
-            SetHorizontalOffset(HorizontalOffset + ViewportWidth);
-        }
-
-        public void PageUp()
-        {
-            SetVerticalOffset(VerticalOffset - ViewportHeight);
-        }
-
-        public void SetHorizontalOffset(double offset)
-        {
-            offset = -Math.Max(0, Math.Min(offset, ExtentWidth - ViewportWidth));
-
-            if (offset.IsSameAs(viewPort.X, 1))
-            {
-                return;
-            }
-
-            viewPort.X = offset;
-            InvalidateArrange();
-        }
-
-        public void SetVerticalOffset(double offset)
-        {
-            offset = -Math.Max(0, Math.Min(offset, ExtentHeight - ViewportHeight));
-
-            if (offset.IsSameAs(viewPort.Y, 1))
-            {
-                return;
-            }
-
-            viewPort.Y = offset;
-            InvalidateArrange();
         }
 
         #endregion

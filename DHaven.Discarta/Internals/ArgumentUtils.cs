@@ -95,5 +95,23 @@ namespace DHaven.DisCarta.Internals
         {
             return value.IsGreaterThanOrSame(minValue, precision) && value.IsLessThanOrSame(maxValue, precision);
         }
+
+        /// <summary>
+        /// Ensure that the value is within the range, or clipped to one of the extremes.
+        /// </summary>
+        /// <param name="value">the value to compare</param>
+        /// <param name="minValue">the minimum allowed value</param>
+        /// <param name="maxValue">the maximum allowed value</param>
+        /// <param name="precision">the amount of acceptable error</param>
+        /// <returns></returns>
+        public static double ClipToRange(this double value, double minValue, double maxValue, double precision)
+        {
+            if (value.IsInRange(minValue, maxValue, precision))
+            {
+                return value;
+            }
+
+            return value < minValue ? minValue : maxValue;
+        }
     }
 }

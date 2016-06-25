@@ -29,31 +29,35 @@
                 <DropShadowEffect ShadowDepth="2" />
             </TextBlock.Effect>
         </TextBlock>
-        <ScrollViewer Grid.Column="0" CanContentScroll="True">
-            <DisCarta:Map>
-                <DisCarta:Map.Projection>
-                    <Projections:PseudoMercatorProjection />
-                </DisCarta:Map.Projection>
-                <DisCarta:MapLayer Background="LightSteelBlue">
-                    <!--<Image Source="World.png" Stretch="Fill" DisCarta:Geo.Area="{StaticResource World}"/>-->
-                </DisCarta:MapLayer>
-            </DisCarta:Map>
-        </ScrollViewer>
+        <Border Grid.Column="0" BorderBrush="Black" BorderThickness="1">
+            <ScrollViewer CanContentScroll="True">
+                <DisCarta:Map>
+                    <DisCarta:Map.Projection>
+                        <Projections:PseudoMercatorProjection />
+                    </DisCarta:Map.Projection>
+                    <DisCarta:MapLayer Background="LightSteelBlue">
+                        <Image Source="World.png" Stretch="Fill" DisCarta:Geo.Area="{StaticResource World}"/>
+                    </DisCarta:MapLayer>
+                </DisCarta:Map>
+            </ScrollViewer>
+        </Border>
         <TextBlock Grid.Column="1" Panel.ZIndex="100" VerticalAlignment="Bottom" HorizontalAlignment="Center"
                    FontFamily="Segue UI" FontSize="24" Foreground="LimeGreen" Text="Equirectangular">
             <TextBlock.Effect>
                 <DropShadowEffect ShadowDepth="2" />
             </TextBlock.Effect>
         </TextBlock>
-        <ScrollViewer Grid.Column="1" CanContentScroll="True">
+        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="1">
+        <ScrollViewer CanContentScroll="True">
             <DisCarta:Map>
                 <DisCarta:Map.Projection>
                     <Projections:EquirectangularProjection />
                 </DisCarta:Map.Projection>
                 <DisCarta:MapLayer Background="LightSteelBlue">
-                    <!--<Image Source="World.png" Stretch="Fill" DisCarta:Geo.Area="{StaticResource World}"/>-->
+                    <Image Source="World.png" Stretch="Fill" DisCarta:Geo.Area="{StaticResource World}"/>
                 </DisCarta:MapLayer>
             </DisCarta:Map>
         </ScrollViewer>
+        </Border>
     </Grid>
 </Window>
