@@ -49,26 +49,26 @@ namespace DHaven.DisCarta.Projections
 
         public GeoArea World => new GeoArea(90, 180, -90, -180);
 
-        private static double ToX(double longitude, GeoVector extentSize, Size pixelArea)
+        private static double ToX(double longitude, double scale)
         {
             // Shift the longitude so that is always positive.
-            return (longitude + 180) * (pixelArea.Width / extentSize.DeltaLongitude);
+            return (longitude + 180) * scale;
         }
 
-        private static double ToY(double latitude, GeoVector extentSize, Size pixelArea)
+        private static double ToY(double latitude, double scale)
         {
             // Flip latitude coordinates and shift so that it is always visible
-            return (90 - latitude) * (pixelArea.Height / extentSize.DeltaLatitude);
+            return (90 - latitude) * scale;
         }
 
-        private static double ToLon(double x, GeoVector extentSize, Size pixelArea)
+        private static double ToLon(double x, double scale)
         {
-            return x * (extentSize.DeltaLongitude / pixelArea.Width) - 180;
+            return (x / scale) - 180;
         }
 
-        private static double ToLat(double y, GeoVector extentSize, Size pixelArea)
+        private static double ToLat(double y, double scale)
         {
-            return y * (extentSize.DeltaLatitude / pixelArea.Height) - 90;
+            return 90 - (y / scale);
         }
 
         #region Implementations
@@ -88,23 +88,29 @@ namespace DHaven.DisCarta.Projections
         public GeoPoint ToGeoPoint(Point point, Extent mapView)
         {
             var mapSize = FullMapSizeFor(mapView.ZoomLevel);
+            var horizontalScale = mapSize.Width / World.Size.DeltaLongitude;
+            var verticalScale = mapSize.Height / World.Size.DeltaLatitude;
 
             return new GeoPoint
             {
-                Latitude = ToLat(point.Y, mapView.Area.Size, mapSize),
-                Longitude = ToLon(point.X, mapView.Area.Size, mapSize)
+                Latitude = ToLat(point.Y, verticalScale),
+                Longitude = ToLon(point.X, horizontalScale)
             };
         }
 
         public Point ToPoint(GeoPoint point, Extent mapView)
         {
             var mapSize = FullMapSizeFor(mapView.ZoomLevel);
+            var horizontalScale = mapSize.Width / World.Size.DeltaLongitude;
+            var verticalScale = mapSize.Height / World.Size.DeltaLatitude;
 
-            return new Point
+            var transFormedPoint = new Point
             {
-                X = ToX(point.Longitude, mapView.Area.Size, mapSize),
-                Y = ToY(point.Latitude, mapView.Area.Size, mapSize)
+                X = ToX(point.Longitude, horizontalScale),
+                Y = ToY(point.Latitude, verticalScale)
             };
+
+            return transFormedPoint;
         }
 
         public Rect ToRect(Extent mapView)

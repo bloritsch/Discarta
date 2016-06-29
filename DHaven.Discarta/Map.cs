@@ -307,13 +307,7 @@ namespace DHaven.DisCarta
 
         public override void MouseWheelDown()
         {
-            var proportion = ViewportWidth / ExtentWidth;
-
-            // TODO: alter extent to use mouse position for zoom anchor
-            Extent.ZoomLevel = Math.Max(0, Extent.ZoomLevel - 1);
-
-            SetHorizontalOffset(HorizontalOffset / proportion);
-            SetVerticalOffset(VerticalOffset / proportion);
+            ChangeZoom(Math.Max(0, Extent.ZoomLevel - 1));
         }
 
         public override void MouseWheelLeft()
@@ -328,13 +322,25 @@ namespace DHaven.DisCarta
 
         public override void MouseWheelUp()
         {
-            var proportion = ViewportWidth / ExtentWidth;
+            ChangeZoom(Math.Min(MaxZoomLevel, Extent.ZoomLevel + 1));
+        }
+
+        private void ChangeZoom(int newZoomLevel)
+        {
+            var currentCenterPoint = new Point
+            {
+                X = ViewPort.X + ViewportWidth / 2,
+                Y = ViewPort.Y + ViewportHeight / 2
+            };
+
+            var proportion = currentCenterPoint.X / ExtentWidth;
 
             // TODO: alter extent to use mouse position for zoom anchor
-            Extent.ZoomLevel = Math.Min(MaxZoomLevel, Extent.ZoomLevel + 1);
+            Extent.ZoomLevel = newZoomLevel;
 
-            SetHorizontalOffset(HorizontalOffset / proportion);
-            SetVerticalOffset(VerticalOffset / proportion);
+            // The PanelExtent is now updated.
+            SetHorizontalOffset((currentCenterPoint.X * proportion) - ViewPort.X);
+            SetVerticalOffset((currentCenterPoint.Y * proportion) - ViewPort.Y);
         }
 
         #endregion
