@@ -36,7 +36,7 @@
                         <Projections:PseudoMercatorProjection />
                     </DisCarta:Map.Projection>
                     <DisCarta:MapLayer Background="LightSteelBlue">
-                        <Image Source="World_geo.tif" Stretch="Fill" DisCarta:Geo.Area="{StaticResource World}"/>
+                        <Image Source="World_geo.tif" Stretch="Fill" DisCarta:Geo.Area="{StaticResource World}" />
                     </DisCarta:MapLayer>
                 </DisCarta:Map>
             </ScrollViewer>
@@ -48,16 +48,16 @@
             </TextBlock.Effect>
         </TextBlock>
         <Border Grid.Column="1" BorderBrush="Black" BorderThickness="1">
-        <ScrollViewer CanContentScroll="True">
-            <DisCarta:Map>
-                <DisCarta:Map.Projection>
-                    <Projections:EquirectangularProjection />
-                </DisCarta:Map.Projection>
-                <DisCarta:MapLayer Background="LightSteelBlue">
-                    <Image Source="World_geo.tif" Stretch="Fill" DisCarta:Geo.Area="{StaticResource World}"/>
-                </DisCarta:MapLayer>
-            </DisCarta:Map>
-        </ScrollViewer>
+            <ScrollViewer CanContentScroll="True">
+                <DisCarta:Map>
+                    <DisCarta:Map.Projection>
+                        <Projections:EquirectangularProjection />
+                    </DisCarta:Map.Projection>
+                    <DisCarta:MapLayer Background="LightSteelBlue">
+                        <Image Source="World_geo.tif" Stretch="Fill" DisCarta:Geo.Area="{StaticResource World}" />
+                    </DisCarta:MapLayer>
+                </DisCarta:Map>
+            </ScrollViewer>
         </Border>
     </Grid>
 </Window>

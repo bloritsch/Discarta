@@ -17,7 +17,6 @@
 namespace DHaven.DisCarta
 {
     using System;
-    using System.Runtime.InteropServices;
     using Internals;
 
     public struct GeoArea : IEquatable<GeoArea>
@@ -91,7 +90,8 @@ namespace DHaven.DisCarta
 
         public GeoPoint SouthWest => new GeoPoint(NorthWest.Latitude - Size.DeltaLatitude, NorthWest.Longitude);
 
-        public GeoPoint SouthEast => new GeoPoint(NorthWest.Latitude - Size.DeltaLatitude, NorthWest.Longitude + Size.DeltaLongitude);
+        public GeoPoint SouthEast
+            => new GeoPoint(NorthWest.Latitude - Size.DeltaLatitude, NorthWest.Longitude + Size.DeltaLongitude);
 
         public GeoPoint Center => new GeoPoint(NorthWest.Latitude - Size.DeltaLatitude / 2,
             NorthWest.Longitude + Size.DeltaLongitude / 2);

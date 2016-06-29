@@ -97,7 +97,7 @@ namespace DHaven.DisCarta.Internals
         }
 
         /// <summary>
-        /// Ensure that the value is within the range, or clipped to one of the extremes.
+        ///     Ensure that the value is within the range, or clipped to one of the extremes.
         /// </summary>
         /// <param name="value">the value to compare</param>
         /// <param name="minValue">the minimum allowed value</param>

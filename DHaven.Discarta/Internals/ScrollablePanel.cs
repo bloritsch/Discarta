@@ -23,8 +23,8 @@ namespace DHaven.DisCarta.Internals
     using System.Windows.Media;
 
     /// <summary>
-    /// Internal class to separate all the scroll view logic from the actual
-    /// map logic.
+    ///     Internal class to separate all the scroll view logic from the actual
+    ///     map logic.
     /// </summary>
     public abstract class ScrollablePanel : Panel, IScrollInfo
     {
@@ -33,13 +33,13 @@ namespace DHaven.DisCarta.Internals
         protected Rect ViewPort;
 
         /// <summary>
-        /// Gets or sets the amount the view port moves for line up/down/left/right
-        /// movement.
+        ///     Gets or sets the amount the view port moves for line up/down/left/right
+        ///     movement.
         /// </summary>
         protected double LineLength { get; set; } = 96 / 2.54; // 1 cm in DPU
 
         /// <summary>
-        /// Override this to perform work if the view port chnages size, etc.
+        ///     Override this to perform work if the view port chnages size, etc.
         /// </summary>
         protected virtual void OnViewPortChanged()
         {
@@ -53,7 +53,7 @@ namespace DHaven.DisCarta.Internals
             {
                 ViewPort.Size = new Size(
                     double.IsInfinity(availableSize.Width) ? ActualWidth : availableSize.Width,
-                    double.IsInfinity(availableSize.Height) ? ActualHeight: availableSize.Height);
+                    double.IsInfinity(availableSize.Height) ? ActualHeight : availableSize.Height);
 
                 CanHorizontallyScroll = ExtentWidth > ViewportWidth;
                 CanVerticallyScroll = ExtentHeight > ViewportHeight;
@@ -71,7 +71,6 @@ namespace DHaven.DisCarta.Internals
 
             return PanelExtent.Size;
         }
-
 
         #region Implementation of IScrollInfo
 

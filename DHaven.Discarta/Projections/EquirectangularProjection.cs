@@ -63,12 +63,12 @@ namespace DHaven.DisCarta.Projections
 
         private static double ToLon(double x, double scale)
         {
-            return (x / scale) - 180;
+            return x / scale - 180;
         }
 
         private static double ToLat(double y, double scale)
         {
-            return 90 - (y / scale);
+            return 90 - y / scale;
         }
 
         #region Implementations

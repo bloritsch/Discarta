@@ -91,6 +91,36 @@ namespace DHaven.DisCarta
             dependencyObject.SetValue(ExtentProperty, value);
         }
 
+        public override Rect MakeVisible(Visual visual, Rect rectangle)
+        {
+            // We'll just assume the source Rect is correct for now.
+            // When we actually get to placing things on screen
+            // we'll fix this.
+            rectangle.Intersect(PanelExtent);
+
+            return rectangle;
+        }
+
+        public override void MouseWheelDown()
+        {
+            ChangeZoom(Math.Max(0, Extent.ZoomLevel - 1));
+        }
+
+        public override void MouseWheelLeft()
+        {
+            MouseWheelDown();
+        }
+
+        public override void MouseWheelRight()
+        {
+            MouseWheelUp();
+        }
+
+        public override void MouseWheelUp()
+        {
+            ChangeZoom(Math.Min(MaxZoomLevel, Extent.ZoomLevel + 1));
+        }
+
         protected override Size ArrangeOverride(Size finalSize)
         {
             if (loading || Projection == null || Extent == null || Extent.Area.IsEmpty)
@@ -126,6 +156,23 @@ namespace DHaven.DisCarta
             return collection;
         }
 
+        #region Overrides of ScrollablePanel
+
+        /// <summary>
+        ///     Override this to perform work if the view port chnages size, etc.
+        /// </summary>
+        protected override void OnViewPortChanged()
+        {
+            base.OnViewPortChanged();
+
+            if (Projection != null && Extent != null)
+            {
+                Extent.Area = Projection.ToGeoArea(ViewPort, Extent);
+            }
+        }
+
+        #endregion
+
         private void BindLayer(MapLayer child)
         {
             if (child == null)
@@ -147,23 +194,6 @@ namespace DHaven.DisCarta
                 Mode = BindingMode.TwoWay
             });
         }
-
-        #region Overrides of ScrollablePanel
-
-        /// <summary>
-        /// Override this to perform work if the view port chnages size, etc.
-        /// </summary>
-        protected override void OnViewPortChanged()
-        {
-            base.OnViewPortChanged();
-
-            if (Projection != null && Extent != null)
-            {
-                Extent.Area = Projection.ToGeoArea(ViewPort, Extent);
-            }
-        }
-
-        #endregion
 
         private void UnbindLayer(MapLayer child)
         {
@@ -293,38 +323,6 @@ namespace DHaven.DisCarta
             VisualExtentValuesChanged(this, new PropertyChangedEventArgs(string.Empty));
         }
 
-        #region Implementations
-
-        public override Rect MakeVisible(Visual visual, Rect rectangle)
-        {
-            // We'll just assume the source Rect is correct for now.
-            // When we actually get to placing things on screen
-            // we'll fix this.
-            rectangle.Intersect(PanelExtent);
-
-            return rectangle;
-        }
-
-        public override void MouseWheelDown()
-        {
-            ChangeZoom(Math.Max(0, Extent.ZoomLevel - 1));
-        }
-
-        public override void MouseWheelLeft()
-        {
-            MouseWheelDown();
-        }
-
-        public override void MouseWheelRight()
-        {
-            MouseWheelUp();
-        }
-
-        public override void MouseWheelUp()
-        {
-            ChangeZoom(Math.Min(MaxZoomLevel, Extent.ZoomLevel + 1));
-        }
-
         private void ChangeZoom(int newZoomLevel)
         {
             var currentCenterPoint = new Point
@@ -339,10 +337,8 @@ namespace DHaven.DisCarta
             Extent.ZoomLevel = newZoomLevel;
 
             // The PanelExtent is now updated.
-            SetHorizontalOffset((currentCenterPoint.X * proportion) - ViewPort.X);
-            SetVerticalOffset((currentCenterPoint.Y * proportion) - ViewPort.Y);
+            SetHorizontalOffset(currentCenterPoint.X * proportion - ViewPort.X);
+            SetVerticalOffset(currentCenterPoint.Y * proportion - ViewPort.Y);
         }
-
-        #endregion
     }
 }
