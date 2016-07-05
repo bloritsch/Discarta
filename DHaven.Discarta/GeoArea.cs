@@ -19,18 +19,35 @@ namespace DHaven.DisCarta
     using System;
     using Internals;
 
+    /// <summary>
+    ///     Represents a rectangular geographic area on a map.
+    /// </summary>
     public struct GeoArea : IEquatable<GeoArea>
     {
+        /// <summary>
+        ///     Represents an empty GeoArea.
+        /// </summary>
         public static readonly GeoArea Empty = new GeoArea(GeoPoint.Empty, GeoVector.Empty);
+
         private GeoPoint northWest;
         private GeoVector size;
 
-        public GeoArea(double north, double east, double south, double west) : this()
-        {
-            NorthWest = new GeoPoint(north, west);
-            Size = new GeoVector(north - south, east - west);
-        }
+        /// <summary>
+        ///     Create a GeoArea using the bounding lat/lon values
+        /// </summary>
+        /// <param name="north">the northern boundary (max Lat)</param>
+        /// <param name="east">the eastern boundary (max Lon)</param>
+        /// <param name="south">the southern boundary (min Lat)</param>
+        /// <param name="west">the western boundary (min Lon)</param>
+        public GeoArea(double north, double east, double south, double west)
+            : this(new GeoPoint(north, west), new GeoPoint(south, east)) {}
 
+        /// <summary>
+        ///     Create a GeoArea using the northwest point and a GeoVector
+        ///     for the size.
+        /// </summary>
+        /// <param name="northWestIn">the northwest point</param>
+        /// <param name="dimensionsIn">the size of the geo area</param>
         public GeoArea(GeoPoint northWestIn, GeoVector dimensionsIn) : this()
         {
             nameof(northWestIn).ThrowIfNull(northWestIn);
@@ -39,6 +56,10 @@ namespace DHaven.DisCarta
             Size = dimensionsIn;
         }
 
+        /// <summary>
+        ///     Create a bounding GeoArea from an array of points.
+        /// </summary>
+        /// <param name="pointsInExtent">the points within the area</param>
         public GeoArea(params GeoPoint[] pointsInExtent) : this()
         {
             if (pointsInExtent.Length == 0)
@@ -84,38 +105,79 @@ namespace DHaven.DisCarta
             set { size = value; }
         }
 
+        /// <summary>
+        ///     Gets whether the GeoArea is empty.
+        /// </summary>
         public bool IsEmpty => NorthWest.IsEmpty || Size.IsEmpty;
 
+        /// <summary>
+        ///     Gets the north east point.
+        /// </summary>
         public GeoPoint NorthEast => new GeoPoint(NorthWest.Latitude, NorthWest.Longitude + Size.DeltaLongitude);
 
+        /// <summary>
+        ///     Gets the south west point.
+        /// </summary>
         public GeoPoint SouthWest => new GeoPoint(NorthWest.Latitude - Size.DeltaLatitude, NorthWest.Longitude);
 
+        /// <summary>
+        ///     Gets the south east point.
+        /// </summary>
         public GeoPoint SouthEast
             => new GeoPoint(NorthWest.Latitude - Size.DeltaLatitude, NorthWest.Longitude + Size.DeltaLongitude);
 
+        /// <summary>
+        ///     Gets the center point of the geo area.
+        /// </summary>
         public GeoPoint Center => new GeoPoint(NorthWest.Latitude - Size.DeltaLatitude / 2,
             NorthWest.Longitude + Size.DeltaLongitude / 2);
 
+        /// <summary>
+        ///     Determines if two GeoAreas are equivalent.
+        /// </summary>
+        /// <param name="first">the primary GeoArea</param>
+        /// <param name="second">the secondary GeoArea</param>
+        /// <returns>true if they are equivalent</returns>
         public static bool operator ==(GeoArea first, GeoArea second)
         {
             return first.Equals(second);
         }
 
+        /// <summary>
+        ///     Determines if two GeoAreas are not equivalent.
+        /// </summary>
+        /// <param name="first">the primary GeoArea</param>
+        /// <param name="second">the secondary GeoArea</param>
+        /// <returns>false if they are equivalent</returns>
         public static bool operator !=(GeoArea first, GeoArea second)
         {
             return !first.Equals(second);
         }
 
+        /// <summary>
+        ///     Determines if another GeoArea is equivalent to this one.
+        /// </summary>
+        /// <param name="other">the other GeoArea</param>
+        /// <returns>true if they are equivalent</returns>
         public bool Equals(GeoArea other)
         {
             return NorthWest == other.NorthWest && Size == other.Size;
         }
 
+        /// <summary>
+        ///     Determines if this GeoArea is equivalent to the provided object.
+        /// </summary>
+        /// <param name="obj">the object</param>
+        /// <returns>true if the object is a GeoArea and is equivalent to this one</returns>
         public override bool Equals(object obj)
         {
             return obj is GeoArea && Equals((GeoArea) obj);
         }
 
+        /// <summary>
+        ///     Calculate a hashcode for this GeoArea.
+        /// </summary>
+        /// <returns>the hash code</returns>
         public override int GetHashCode()
         {
             unchecked
@@ -128,6 +190,11 @@ namespace DHaven.DisCarta
             }
         }
 
+        /// <summary>
+        ///     Expand this GeoArea by the amount of the GeoVector.
+        ///     NOTE: increases the size of the GeoArea equally around the center.
+        /// </summary>
+        /// <param name="dimensions">the GeoVector representing the delta</param>
         public void Expand(GeoVector dimensions)
         {
             // Split the difference so that the center doesn't change.
@@ -137,6 +204,12 @@ namespace DHaven.DisCarta
             size.DeltaLongitude += dimensions.DeltaLongitude / 2;
         }
 
+        /// <summary>
+        ///     Calculate the intersection of the first and second GeoArea.
+        /// </summary>
+        /// <param name="first">the primary GeoArea</param>
+        /// <param name="second">the secondary GeoArea</param>
+        /// <returns>the GeoArea that represents the intersection between them</returns>
         public static GeoArea Intersection(GeoArea first, GeoArea second)
         {
             return new GeoArea(
@@ -146,6 +219,10 @@ namespace DHaven.DisCarta
                 Math.Max(first.SouthWest.Longitude, second.SouthWest.Longitude));
         }
 
+        /// <summary>
+        ///     Represents the GeoArea as a string.
+        /// </summary>
+        /// <returns>{Northeast, SouthEast}</returns>
         public override string ToString()
         {
             return $"{{{NorthWest}, {SouthEast}}}";

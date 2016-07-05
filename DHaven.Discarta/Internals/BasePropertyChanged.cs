@@ -30,10 +30,7 @@ namespace DHaven.DisCarta.Internals
         /// </summary>
         protected void RaiseAllPropertiesChanged()
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(string.Empty));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(string.Empty));
         }
 
         /// <summary>

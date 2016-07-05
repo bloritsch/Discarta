@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DHaven.DisCarta", "DHaven.DisCarta\DHaven.DisCarta.csproj", "{F27469BF-0000-4C66-907A-8656F2AF03CF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleClient", "ExampleClient\ExampleClient.csproj", "{E01A7ED8-53CD-4246-A3AB-89575B3CF7B5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DHaven.DisCarta.PreProcessor", "DHaven.DisCarta.PreProcessor\DHaven.DisCarta.PreProcessor.csproj", "{599C18D7-0DF6-4C14-9EE0-C64A4687DEC9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{E01A7ED8-53CD-4246-A3AB-89575B3CF7B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E01A7ED8-53CD-4246-A3AB-89575B3CF7B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E01A7ED8-53CD-4246-A3AB-89575B3CF7B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{599C18D7-0DF6-4C14-9EE0-C64A4687DEC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{599C18D7-0DF6-4C14-9EE0-C64A4687DEC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{599C18D7-0DF6-4C14-9EE0-C64A4687DEC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{599C18D7-0DF6-4C14-9EE0-C64A4687DEC9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

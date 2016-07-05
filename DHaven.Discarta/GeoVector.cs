@@ -19,65 +19,103 @@ namespace DHaven.DisCarta
     using System;
     using Internals;
 
+    /// <summary>
+    /// Represents the change in lat/lon between two points.
+    /// </summary>
     public struct GeoVector : IEquatable<GeoVector>
     {
+        /// <summary>
+        /// An empty GeoVector, which is different than one with 0 value.
+        /// </summary>
         public static readonly GeoVector Empty = new GeoVector
         {
             DeltaLatitude = double.NaN,
             DeltaLongitude = double.NaN,
         };
 
+        /// <summary>
+        /// Create a GeoVector using the provided values.
+        /// </summary>
+        /// <param name="deltaLat">the change in latitude</param>
+        /// <param name="deltaLon">the change in longitude</param>
         public GeoVector(double deltaLat, double deltaLon)
         {
             DeltaLatitude = deltaLat;
             DeltaLongitude = deltaLon;
         }
 
+        /// <summary>
+        /// Gets or sets the change in Latitude.
+        /// </summary>
         public double DeltaLatitude { get; set; }
+
+        /// <summary>
+        /// Gets or sets the change in Longitude.
+        /// </summary>
         public double DeltaLongitude { get; set; }
 
-        public bool IsEmpty
-        {
-            get { return double.IsNaN(DeltaLatitude) || double.IsNaN(DeltaLongitude); }
-        }
+        /// <summary>
+        /// Determines if this GeoVector is Empty (i.e. the same as GeoVector.Empty)
+        /// </summary>
+        public bool IsEmpty => double.IsNaN(DeltaLatitude) || double.IsNaN(DeltaLongitude);
 
         /// <summary>
         ///     Gets the magnitude of the vector (Pythagoras' theorum).
         /// </summary>
-        public double Magnitude
-        {
-            get { return Math.Sqrt(DeltaLatitude * DeltaLatitude + DeltaLongitude * DeltaLongitude); }
-        }
+        public double Magnitude => Math.Sqrt(DeltaLatitude * DeltaLatitude + DeltaLongitude * DeltaLongitude);
 
         /// <summary>
         ///     Gets the angle in degrees created by the vector.
         /// </summary>
-        public double Angle
-        {
-            get { return ArgumentUtils.ToDegrees(Math.Atan(DeltaLatitude / DeltaLongitude)); }
-        }
+        public double Angle => ArgumentUtils.ToDegrees(Math.Atan(DeltaLatitude / DeltaLongitude));
 
+        /// <summary>
+        /// Determine if two GeoVectors are equivalent.  We compare down to 5 decimal places (~approximately 1m precision).
+        /// </summary>
+        /// <param name="first">the GeoVector being compared against</param>
+        /// <param name="second">the GeoVector being compared with</param>
+        /// <returns>true if the two vectors are equivalent</returns>
         public static bool operator ==(GeoVector first, GeoVector second)
         {
             return first.Equals(second);
         }
 
+        /// <summary>
+        /// Determine if two GeoVectors are not equivalent.
+        /// </summary>
+        /// <param name="first">the GeoVector being compared against</param>
+        /// <param name="second">the GeoVector being compared with</param>
+        /// <returns>false if the two vectors are equivalent</returns>
         public static bool operator !=(GeoVector first, GeoVector second)
         {
             return !first.Equals(second);
         }
 
+        /// <summary>
+        /// Determine if a GeoVectors is equivalent with this one.  We compare down to 5 decimal places (~approximately 1m precision).
+        /// </summary>
+        /// <param name="other">the GeoVector being compared with</param>
+        /// <returns>true if the two vectors are equivalent</returns>
         public bool Equals(GeoVector other)
         {
-            return ArgumentUtils.IsSameAs(DeltaLatitude, other.DeltaLatitude, ArgumentUtils.DegreePrecision)
-                   && ArgumentUtils.IsSameAs(DeltaLongitude, other.DeltaLongitude, ArgumentUtils.DegreePrecision);
+            return DeltaLatitude.IsSameAs(other.DeltaLatitude, ArgumentUtils.DegreePrecision)
+                   && DeltaLongitude.IsSameAs(other.DeltaLongitude, ArgumentUtils.DegreePrecision);
         }
 
+        /// <summary>
+        /// Determine if the object is equivalent with this GeoVector.  We compare down to 5 decimal places (~approximately 1m precision).
+        /// </summary>
+        /// <param name="obj">the object being compared</param>
+        /// <returns>true if the two vectors are equivalent</returns>
         public override bool Equals(object obj)
         {
             return obj is GeoVector && Equals((GeoVector) obj);
         }
 
+        /// <summary>
+        /// Calculate the hashcode from the current values in this GeoVector.
+        /// </summary>
+        /// <returns>a hashcode</returns>
         public override int GetHashCode()
         {
             unchecked
@@ -90,9 +128,13 @@ namespace DHaven.DisCarta
             }
         }
 
+        /// <summary>
+        /// Represents the GeoVector as a string.
+        /// </summary>
+        /// <returns>the string representation</returns>
         public override string ToString()
         {
-            return string.Format("[ΔLat: {0}, ΔLon: {1}]", DeltaLatitude, DeltaLongitude);
+            return $"[ΔLat: {DeltaLatitude}, ΔLon: {DeltaLongitude}]";
         }
     }
 }
