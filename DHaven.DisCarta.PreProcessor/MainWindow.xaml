@@ -21,10 +21,11 @@
         <ListView Grid.Row="1" Grid.Column="0" ItemsSource="{Binding Model.PotentialTiles}" SelectedItem="{Binding SelectedFile}">
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <Label Content="{Binding Path}"/>
+                    <Label Content="{Binding FullPath}"/>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
+        <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="0"><Label>Selected Map Image: </Label><Label Content="{Binding SelectedFile.FileName}"/></StackPanel>
     </Grid>
 </controls:MetroWindow>
 

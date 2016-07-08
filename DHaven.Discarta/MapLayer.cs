@@ -125,8 +125,11 @@ namespace DHaven.DisCarta
 
                 // Until I add HotSpot support, center over the point
                 var destRect = new Rect(hotSpotPoint, pointSize);
-                destRect.X -= pointSize.Width / 2;
-                destRect.Y -= pointSize.Height / 2;
+                var hotSpotX = Geo.GetHotSpotX(element);
+                var hotSpotY = Geo.GetHotSpotY(element);
+
+                destRect.X -= hotSpotX.Apply(destRect.Width);
+                destRect.Y -= hotSpotY.Apply(destRect.Height);
 
                 element.Arrange(destRect);
             }

@@ -26,7 +26,7 @@ namespace DHaven.DisCarta.Projections
 
         public string Name => "WGS 84 / Pseudo - Mercator";
 
-        public string WKT => @"PROJCS[""WGS 84 / Pseudo - Mercator"",
+        public string Wkt => @"PROJCS[""WGS 84 / Pseudo - Mercator"",
     GEOGCS[""WGS 84"",
         DATUM[""WGS_1984"",
             SPHEROID[""WGS 84"", 6378137, 298.257223563,

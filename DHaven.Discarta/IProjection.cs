@@ -32,7 +32,7 @@ namespace DHaven.DisCarta
         /// <summary>
         ///     The Well Known Text definition.  Used by GDAL, and many other spatial system.
         /// </summary>
-        string WKT { get; }
+        string Wkt { get; }
 
         GeoArea World { get; }
 

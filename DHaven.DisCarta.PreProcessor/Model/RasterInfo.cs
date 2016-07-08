@@ -16,6 +16,7 @@
 
 namespace DHaven.DisCarta.PreProcessor.Model
 {
+    using System.IO;
     using System.Threading.Tasks;
     using System.Windows;
     using OSGeo.GDAL;
@@ -30,15 +31,21 @@ namespace DHaven.DisCarta.PreProcessor.Model
         /// <summary>
         ///     Internal constructor, prevents other classes from instantiating it directly
         /// </summary>
-        private RasterInfo(string path)
+        private RasterInfo(string fullPath)
         {
-            Path = path;
+            FullPath = fullPath;
+            FileName = Path.GetFileName(FullPath);
+            Directory = Path.GetDirectoryName(FullPath);
         }
 
         /// <summary>
-        /// Gets the path to the file that this metadata belongs to.
+        /// Gets the FullPath to the file that this metadata belongs to.
         /// </summary>
-        public string Path { get; private set; }
+        public string FullPath { get; }
+
+        public string FileName { get; private set; }
+
+        public string Directory { get; private set; }
 
         /// <summary>
         /// Gets the projection used in the raster file so we can determine if it needs warping.

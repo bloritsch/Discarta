@@ -48,6 +48,9 @@
     <Compile Include="GeoArea.cs" />
     <Compile Include="GeoPoint.cs" />
     <Compile Include="GeoVector.cs" />
+    <Compile Include="HotSpot.cs" />
+    <Compile Include="HotSpotConverter.cs" />
+    <Compile Include="HotSpotUnit.cs" />
     <Compile Include="Internals\BasePropertyChanged.cs" />
     <Compile Include="Internals\ArgumentUtils.cs" />
     <Compile Include="Internals\NotifyingUIElementCollection.cs" />

@@ -34,6 +34,36 @@ namespace DHaven.DisCarta
             new FrameworkPropertyMetadata(GeoPoint.Empty,
                 FrameworkPropertyMetadataOptions.AffectsArrange | FrameworkPropertyMetadataOptions.AffectsParentArrange));
 
+        public static readonly DependencyProperty HotSpotXProperty = DependencyProperty.RegisterAttached("HotSpotX",
+            typeof(HotSpot), typeof(Geo),
+            new FrameworkPropertyMetadata(HotSpot.Center,
+                FrameworkPropertyMetadataOptions.AffectsArrange | FrameworkPropertyMetadataOptions.AffectsParentArrange));
+
+        public static readonly DependencyProperty HotSpotYProperty = DependencyProperty.RegisterAttached("HotSpotY",
+            typeof(HotSpot), typeof(Geo),
+            new FrameworkPropertyMetadata(HotSpot.Center,
+                FrameworkPropertyMetadataOptions.AffectsArrange | FrameworkPropertyMetadataOptions.AffectsParentArrange));
+
+        public static HotSpot GetHotSpotX(DependencyObject dependencyObject)
+        {
+            return (HotSpot) dependencyObject.GetValue(HotSpotXProperty);
+        }
+
+        public static void SetHotSpotX(DependencyObject dependencyObject, HotSpot value)
+        {
+            dependencyObject.SetValue(HotSpotXProperty, value);
+        }
+
+        public static HotSpot GetHotSpotY(DependencyObject dependencyObject)
+        {
+            return (HotSpot)dependencyObject.GetValue(HotSpotYProperty);
+        }
+
+        public static void SetHotSpotY(DependencyObject dependencyObject, HotSpot value)
+        {
+            dependencyObject.SetValue(HotSpotYProperty, value);
+        }
+
         public static GeoArea GetArea(DependencyObject dependencyObject)
         {
             return (GeoArea) dependencyObject.GetValue(AreaProperty);

@@ -55,8 +55,12 @@ namespace DHaven.DisCarta.PreProcessor.Internal
                 }
 
                 model = value;
-                RaisePropertyChanged(nameof(Model));
+
+                OnModelChanged();
+                RaiseAllPropertiesChanged();
             }
         }
+
+        protected virtual void OnModelChanged() {}
     }
 }

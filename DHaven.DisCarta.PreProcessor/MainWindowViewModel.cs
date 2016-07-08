@@ -33,12 +33,20 @@
 
         private async void LoadFile()
         {
-            VistaFileDialog fileDialog = new VistaOpenFileDialog();
-            fileDialog.Title = Resources.MainWindowViewModel_LoadFile;
-
-            if (fileDialog.ShowDialog() == true)
+            VistaFileDialog fileDialog = new VistaOpenFileDialog
             {
-                await Model.LoadMetadata(fileDialog.FileName);
+                Title = Resources.MainWindowViewModel_LoadFile,
+                Multiselect = true
+            };
+
+            if (fileDialog.ShowDialog() != true)
+            {
+                return;
+            }
+
+            foreach (var name in fileDialog.FileNames)
+            {
+                await Model.LoadMetadata(name);
             }
         }
     }

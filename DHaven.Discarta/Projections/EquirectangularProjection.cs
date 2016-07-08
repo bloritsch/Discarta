@@ -31,7 +31,7 @@ namespace DHaven.DisCarta.Projections
 
         public Size TileSize => new Size(512, 256);
 
-        public string WKT => @"PROJCS[""WGS 84 / World Equidistant Cylindrical"",
+        public string Wkt => @"PROJCS[""WGS 84 / World Equidistant Cylindrical"",
     GEOGCS[""WGS 84"",
         DATUM[""WGS_1984"",
             SPHEROID[""WGS 84"", 6378137, 298.257223563,
