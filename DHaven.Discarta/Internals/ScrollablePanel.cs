@@ -264,6 +264,12 @@ namespace DHaven.DisCarta.Internals
                 // Hase to be done on the dispatcher or it doesn't update right away
                 Action action = () =>
                 {
+                    if (scrollOwner == null)
+                    {
+                        // Just in case it was reset by the time the dispatcher got done with it.
+                        return;
+                    }
+
                     // Ensure we have the scroll bar functionality, but the scrollbars are not visible.
                     scrollOwner.HorizontalScrollBarVisibility = ScrollBarVisibility.Hidden;
                     scrollOwner.VerticalScrollBarVisibility = ScrollBarVisibility.Hidden;

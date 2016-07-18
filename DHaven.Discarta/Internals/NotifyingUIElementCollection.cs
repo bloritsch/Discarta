@@ -24,9 +24,9 @@ namespace DHaven.DisCarta.Internals
     /// <summary>
     ///     Provides a way for maps and map layers to know when child objects are added.
     /// </summary>
-    public class NotifyingUIElementCollection : UIElementCollection, INotifyCollectionChanged
+    public class NotifyingUiElementCollection : UIElementCollection, INotifyCollectionChanged
     {
-        public NotifyingUIElementCollection(UIElement visualParent, FrameworkElement logicalParent)
+        public NotifyingUiElementCollection(UIElement visualParent, FrameworkElement logicalParent)
             : base(visualParent, logicalParent) {}
 
         public override int Add(UIElement element)

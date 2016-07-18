@@ -45,7 +45,7 @@ namespace DHaven.DisCarta
 
         protected override UIElementCollection CreateUIElementCollection(FrameworkElement logicalParent)
         {
-            var collection = new NotifyingUIElementCollection(this, logicalParent);
+            var collection = new NotifyingUiElementCollection(this, logicalParent);
             collection.CollectionChanged += ChildrenCollectionChanged;
 
             return collection;

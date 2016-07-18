@@ -43,12 +43,12 @@ namespace DHaven.DisCarta
 
             if (IsProportional && !Value.IsInRange(0, 1, 0.01))
             {
-                throw new ArgumentException($"{Value} must be between 0 and 1", nameof(value));
+                throw new ArgumentOutOfRangeException(nameof(value), value, "Value must be between 0 and 1");
             }
 
             if (IsAbsolute && Value < 0)
             {
-                throw new ArgumentException($"{Value} must be greater than or equal to 0", nameof(value));
+                throw new ArgumentOutOfRangeException(nameof(value), value, "Value must be positive");
             }
         }
 

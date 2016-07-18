@@ -32,6 +32,7 @@ namespace DHaven.DisCarta
 
     public class Map : ScrollablePanel
     {
+        // ReSharper disable once MemberCanBePrivate.Global
         public const int MaxZoomLevel = 19; // total of 20 zoom levels from 0-19.
 
         public static readonly DependencyProperty ProjectionProperty = DependencyProperty.RegisterAttached(
@@ -45,10 +46,6 @@ namespace DHaven.DisCarta
                 FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange,
                 VisualExtentChanged));
 
-        internal static readonly DependencyProperty OffsetProperty = DependencyProperty.RegisterAttached(
-            "Offset", typeof(Vector), typeof(Map),
-            new FrameworkPropertyMetadata(default(Vector), FrameworkPropertyMetadataOptions.AffectsArrange));
-
         private readonly ITileManager tileManager;
         private bool loading = true;
 
@@ -61,10 +58,12 @@ namespace DHaven.DisCarta
 
         public IProjection Projection
         {
+            // ReSharper disable once MemberCanBePrivate.Global
             get { return GetProjection(this); }
             set { SetProjection(this, value); }
         }
 
+        // ReSharper disable once MemberCanBePrivate.Global
         public Extent Extent
         {
             get { return GetExtent(this); }
@@ -130,6 +129,18 @@ namespace DHaven.DisCarta
 
             var offset = PanelExtent.TopLeft - ViewPort.TopLeft;
 
+            if (ViewPort.Width > PanelExtent.Width)
+            {
+                // center horizontally if the viewport is larger than the map
+                offset.X = (ViewPort.Width - PanelExtent.Width) / 2;
+            }
+
+            if (ViewPort.Height > PanelExtent.Height)
+            {
+                // center vertically if the viewport is larger than the map
+                offset.Y = (ViewPort.Height - PanelExtent.Height) / 2;
+            }
+
             foreach (UIElement child  in InternalChildren)
             {
                 var placement = PanelExtent;
@@ -150,7 +161,7 @@ namespace DHaven.DisCarta
 
         protected override UIElementCollection CreateUIElementCollection(FrameworkElement logicalParent)
         {
-            var collection = new NotifyingUIElementCollection(this, logicalParent);
+            var collection = new NotifyingUiElementCollection(this, logicalParent);
             collection.CollectionChanged += ChildrenCollectionChanged;
 
             return collection;
