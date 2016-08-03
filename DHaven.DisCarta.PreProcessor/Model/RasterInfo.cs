@@ -95,6 +95,10 @@ namespace DHaven.DisCarta.PreProcessor.Model
                 rasterInfo.MapArea = CalculateMapArea(dataset);
             }
 
+            Preprocessor pre = new Preprocessor();
+            pre.ProjectAndTile(rasterInfo, 0, null);
+            pre.ProjectAndTile(rasterInfo, 1, null);
+
             return rasterInfo;
         }
 

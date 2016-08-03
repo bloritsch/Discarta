@@ -89,6 +89,7 @@
     <Compile Include="MainWindowViewModel.cs" />
     <Compile Include="Model\Preprocessor.cs" />
     <Compile Include="Internal\ViewModel.cs" />
+    <Compile Include="Model\Status.cs" />
     <Compile Include="RasterInfoViewModel.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
