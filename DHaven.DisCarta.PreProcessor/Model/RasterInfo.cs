@@ -17,6 +17,7 @@
 namespace DHaven.DisCarta.PreProcessor.Model
 {
     using System.IO;
+    using System.Linq;
     using System.Threading.Tasks;
     using System.Windows;
     using OSGeo.GDAL;
@@ -96,8 +97,10 @@ namespace DHaven.DisCarta.PreProcessor.Model
             }
 
             Preprocessor pre = new Preprocessor();
-            pre.ProjectAndTile(rasterInfo, 0, null);
-            pre.ProjectAndTile(rasterInfo, 1, null);
+            foreach (int zoomLevel in Enumerable.Range(0, 5))
+            {
+                pre.ProjectAndTile(rasterInfo, zoomLevel, null);
+            }
 
             return rasterInfo;
         }

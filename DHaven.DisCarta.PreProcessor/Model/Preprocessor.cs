@@ -64,7 +64,7 @@ namespace DHaven.DisCarta.PreProcessor.Model
 
                 using (var source = Gdal.OpenShared(originFile.FullPath, Access.GA_ReadOnly))
                 using (var destination = Gdal.AutoCreateWarpedVRT(source, source.GetProjection(), projection.Wkt,
-                        ResampleAlg.GRA_CubicSpline, .0125))
+                        ResampleAlg.GRA_NearestNeighbour, .0125))
                 {
                     var sourceInfo = DetermineRenderInformation(destination);
 
